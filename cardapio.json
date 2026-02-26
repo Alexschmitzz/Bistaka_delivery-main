@@ -80,32 +80,6 @@
         "adicionais": []
     },
     {
-        "id": 7,
-        "categoria": "Lanches",
-        "nome": " Smash Duplo",
-        "desc": "Pão Brioche ou Roseta .\r\n2 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese .",
-        "preco": 30.0,
-        "img": "/static/uploads/Smash_Duplo.jpg",
-        "adicionais": [
-            {
-                "nome": "Pão Roseta",
-                "preco": 0.0
-            },
-            {
-                "nome": "Pão Brioche",
-                "preco": 0.0
-            },
-            {
-                "nome": "Queijo muçarela",
-                "preco": 0.0
-            },
-            {
-                "nome": "Queijo cheddar",
-                "preco": 1.0
-            }
-        ]
-    },
-    {
         "id": 11,
         "categoria": "Lanches",
         "nome": "X-Egg",

@@ -273,7 +273,9 @@ def api_pedidos_hoje():
             "itens": p["itens"],
             "total": p["total"],
             "hora": p["data_pedido"][11:16],
-            "pagamento": p["metodo_pagamento"]
+            "pagamento": p["metodo_pagamento"],
+            "status": p["status"],
+
         })
     return jsonify(lista_pedidos)
 
@@ -285,7 +287,7 @@ def dashboard():
 
 @app.route('/api/mudar_status/<int:pedido_id>', methods=['POST'])
 def mudar_status(pedido_id):
-    if not session.get('logged_in'): return redirect(url_for('login'))
+   # if not session.get('logged_in'): return redirect(url_for('login'))
 
     dados = request.json
     novo_status = dados.get('status')

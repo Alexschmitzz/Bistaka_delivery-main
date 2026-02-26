@@ -635,6 +635,7 @@ async function enviarWhatsapp() {
             console.error("Erro ao salvar, mas vamos abrir o whats mesmo assim", error);
         }
 
+        // --- ABRE O WHATSAPP ---
         btn.innerText = textoOriginal;
         btn.disabled = false;
        const linkWhatsApp = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(textoZap)}`;

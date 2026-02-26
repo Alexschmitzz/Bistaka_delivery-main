@@ -133,6 +133,51 @@
         "adicionais": []
     },
     {
+        "id": 14,
+        "categoria": "Hotdogs",
+        "nome": " Hotdog Tradicional",
+        "desc": "Experimente o clássico Hotdog Tradicional, com 2 salsichas suculentas, repolho crocante, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
+        "preco": 23.0,
+        "img": "/static/uploads/hotdogtrad.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 15,
+        "categoria": "Hotdogs",
+        "nome": " Dog Prensado Salsicha",
+        "desc": "Dog Prensado Salsicha, recheado com 2 salsichas, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
+        "preco": 26.0,
+        "img": "/static/uploads/dogprensado.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 16,
+        "categoria": "Hotdogs",
+        "nome": " Dog Prensado Calabresa",
+        "desc": "Dog Calabresa, com 2 salsichas, calabresa, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
+        "preco": 30.0,
+        "img": "/static/uploads/dogprensado.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 17,
+        "categoria": "Hotdogs",
+        "nome": "Dog Prensado Galinha",
+        "desc": "Dog Galinha, com 2 salsichas, galinha desfiada, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
+        "preco": 32.0,
+        "img": "/static/uploads/dogprensado.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 18,
+        "categoria": "Hotdogs",
+        "nome": "Dog Prensado Coração",
+        "desc": "Dog Coração, com 2 salsichas, coração, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
+        "preco": 33.0,
+        "img": "/static/uploads/dogprensado.jpg",
+        "adicionais": []
+    },
+    {
         "id": 2,
         "categoria": "Bebidas",
         "nome": "Coca-Cola Lata",

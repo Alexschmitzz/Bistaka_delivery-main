@@ -105,15 +105,36 @@
             }
 
             pedidos.forEach(p => {
+              
+                const statusAtual = p.status || 'producao';
+                
+                if (statusAtual === 'finalizado') return;
+
+                let botaoStatusHtml = '';
+                let corBorda = '#f39c12';
+                let textoStatus = '👨‍🍳 Em Produção';
+
+                if (statusAtual === 'producao') {
+                    botaoStatusHtml = `<button onclick="mudarStatus(${p.id}, 'despachado')" style="background:#3498db; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 5px; width: 100%;">🛵 Despachar</button>`;
+                } else if (statusAtual === 'despachado') {
+                    corBorda = '#3498db'; 
+                    textoStatus = '🛵 Saiu para Entrega';
+                    botaoStatusHtml = `<button onclick="mudarStatus(${p.id}, 'finalizado')" style="background:#2ecc71; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 5px; width: 100%;">✅ Finalizar</button>`;
+                }
+
                 const itensFormatadosTela = p.itens.replace(/\n/g, '<br>');
                 const infoEndereco = (p.bairro === 'Retirada' || !p.endereco) 
                     ? `<p style="color:#e67e22; font-weight:bold;">🏃 Retirada no Balcão</p>` 
                     : `<p><strong>📍 Entrega:</strong> ${p.endereco} (${p.bairro})</p>`;
                     
                 lista.innerHTML += `
-                    <div class="card-pedido ${p.id === ultimoId ? 'novo' : ''}">
-                        <div class="info-pedido">
-                            <h3><span class="hora-badge">${p.hora}</span> Pedido #${p.id}</h3>
+                    <div class="card-pedido ${p.id === ultimoId ? 'novo' : ''}" style="border-left: 6px solid ${corBorda};">
+                        <div class="info-pedido" style="flex: 1; padding-right: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;">
+                                <h3 style="margin: 0;"><span class="hora-badge">${p.hora}</span> Pedido #${p.id}</h3>
+                                <span style="color: ${corBorda}; font-weight:bold; font-size: 0.9rem;">${textoStatus}</span>
+                            </div>
+                            
                             <p><strong>👤 Cliente:</strong> ${p.nome} <br><small>📞 Tel: ${p.cliente}</small></p>
                             ${infoEndereco}
                             
@@ -123,9 +144,13 @@
                             
                             <p style="color: green; font-weight:bold; margin-top: 10px;">Total: R$ ${p.total.toFixed(2)} (${p.pagamento})</p>
                         </div>
-                        <button class="btn-imprimir" onclick='imprimirComanda(${JSON.stringify(p)})'>
-                            🖨️ Imprimir
-                        </button>
+                        
+                        <div style="display: flex; flex-direction: column; justify-content: center; min-width: 130px;">
+                            ${botaoStatusHtml}
+                            <button class="btn-imprimir" onclick='imprimirComanda(${JSON.stringify(p)})' style="width: 100%;">
+                                🖨️ Imprimir
+                            </button>
+                        </div>
                     </div>
                 `;
             });
@@ -181,6 +206,24 @@
         window.print();
     }
 
+    async function mudarStatus(id, novoStatus) {
+        if(novoStatus === 'finalizado') {
+            const confirmar = confirm("Tem certeza que deseja finalizar? O pedido sairá da tela.");
+            if (!confirmar) return;
+        }
+
+        try {
+            await fetch(`/api/mudar_status/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: novoStatus })
+            });
+            buscarPedidos(); // Recarrega a tela automaticamente!
+        } catch (error) {
+            console.error("Erro ao mudar status:", error);
+            alert("Erro ao atualizar o pedido.");
+        }
+    }
     // Atualiza a cada 10 segundos
     setInterval(buscarPedidos, 10000);
     

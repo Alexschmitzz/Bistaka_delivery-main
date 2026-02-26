@@ -42,6 +42,10 @@ def init_db():
                 FOREIGN KEY(cliente_telefone) REFERENCES clientes(telefone)
             )
         ''')
+        try:
+            cursor.execute("ALTER TABLE pedidos ADD COLUMN status TEXT DEFAULT 'producao'")
+        except:
+            pass 
         conn.commit()
 
 # Inicializa o banco ao iniciar o app
@@ -269,7 +273,9 @@ def api_pedidos_hoje():
             "itens": p["itens"],
             "total": p["total"],
             "hora": p["data_pedido"][11:16],
-            "pagamento": p["metodo_pagamento"]
+            "pagamento": p["metodo_pagamento"],
+            "status": p["status"],
+
         })
     return jsonify(lista_pedidos)
 
@@ -278,6 +284,20 @@ def api_pedidos_hoje():
 def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login'))
     return render_template('dashboard.html')
+
+@app.route('/api/mudar_status/<int:pedido_id>', methods=['POST'])
+def mudar_status(pedido_id):
+    if not session.get('logged_in'): return redirect(url_for('login'))
+
+    dados = request.json
+    novo_status = dados.get('status')
+    
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE pedidos SET status = ? WHERE id = ?", (novo_status, pedido_id))
+        conn.commit()
+        
+    return jsonify({'status': 'sucesso'})
 
 if __name__ == '__main__':
     # Roda acessível na rede local

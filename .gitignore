@@ -1,0 +1,5 @@
+venv/
+__pycache__/
+BISTAKA.db
+log_servidor.txt
+static/uploads/

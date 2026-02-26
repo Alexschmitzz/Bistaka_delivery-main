@@ -293,6 +293,8 @@
     let tipoEntrega = 'delivery';
     let taxaEntrega = 0;
     let bairroSelecionado = '';
+    let clienteLat = null;
+    let clienteLng = null;
 
     // --- CARDÁPIO ---
     let menu = [];
@@ -485,6 +487,9 @@
         document.getElementById('display-taxa').innerText = `R$ ${taxaEntrega.toFixed(2)}`;
         
         // Limpa campo GPS se usar manual
+        clienteLat = null;
+        clienteLng = null;
+
         document.querySelector('.geo-btn').innerText = "📍 Usar minha localização (GPS)";
         document.querySelector('.geo-btn').style.background = "#fff3cd";
     }
@@ -507,8 +512,11 @@
         navigator.geolocation.getCurrentPosition(position => {
             const userLat = position.coords.latitude;
             const userLng = position.coords.longitude;
-            const dist = getDistanceFromLatLonInKm(userLat, userLng, LOJA_COORDS.lat, LOJA_COORDS.lng);
+            clienteLat = userLat;
+            clienteLng = userLng;
             
+            const dist = getDistanceFromLatLonInKm(userLat, userLng, LOJA_COORDS.lat, LOJA_COORDS.lng);
+           
             let valorFrete = null;
             for (let faixa of TABELA_FRETE) {
                 if (dist <= faixa.km) {
@@ -582,6 +590,8 @@ async function enviarWhatsapp() {
         textoZap += `----------------\n`;
         
         let bairroDb = "";
+        let linkMapa = "";
+
         if (tipoEntrega === 'retirada') {
             textoZap += `*Entrega:* Retirada (Grátis)\n`;
             bairroDb = "Retirada";
@@ -589,11 +599,18 @@ async function enviarWhatsapp() {
             textoZap += `*Entrega:* R$ ${taxaEntrega.toFixed(2)}\n`;
             textoZap += `📍 *Endereço:* ${endereco}\n`;
             bairroDb = bairroSelecionado;
-        }
-        
-        textoZap += `*TOTAL: R$ ${totalFinal.toFixed(2)}*\n`;
-        textoZap += `💳 *Pag:* ${pag}`;
 
+            // --- GERA O LINK DO GOOGLE MAPS ---
+            if (clienteLat && clienteLng) {
+                // Se usou GPS, gera o link com as coordenadas exatas
+                linkMapa = `https://maps.google.com/?q=${clienteLat},${clienteLng}`;
+            } else {
+                // Se digitou manual, cria uma busca inteligente no Maps
+                const buscaMaps = `${endereco}, ${bairroSelecionado}, Palhoça - SC`;
+                linkMapa = `https://maps.google.com/?q=${encodeURIComponent(buscaMaps)}`;
+            }
+            textoZap += `🗺️ *Mapa:* ${linkMapa}\n`;
+        }
         // --- SALVAR NO BANCO DE DADOS (NOVO!) ---
         const btn = document.querySelector('.btn-whatsapp');
         const textoOriginal = btn.innerText;
@@ -607,7 +624,7 @@ async function enviarWhatsapp() {
                 body: JSON.stringify({
                     telefone: telefone,
                     nome: nomeCliente,
-                    endereco: endereco,
+                    endereco: endereco + (linkMapa ? ` (Mapa: ${linkMapa})` : ''),
                     bairro: bairroDb,
                     total: totalFinal,
                     pagamento: pag,

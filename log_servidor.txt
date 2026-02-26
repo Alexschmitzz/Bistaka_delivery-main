@@ -1,0 +1,19 @@
+nohup: ignorando entrada
+[2026-02-23 19:38:51 -0300] [4637] [INFO] Starting gunicorn 25.1.0
+[2026-02-23 19:38:51 -0300] [4637] [INFO] Listening at: http://0.0.0.0:5000 (4637)
+[2026-02-23 19:38:51 -0300] [4637] [INFO] Using worker: sync
+[2026-02-23 19:38:51 -0300] [4637] [INFO] Control socket listening at /home/alex/Documentos/Bistaka_delivery-main/gunicorn.ctl
+[2026-02-23 19:38:51 -0300] [4639] [INFO] Booting worker with pid: 4639
+[2026-02-23 19:38:51 -0300] [4645] [INFO] Booting worker with pid: 4645
+[2026-02-23 19:38:51 -0300] [4649] [INFO] Booting worker with pid: 4649
+[2026-02-23 19:38:51 -0300] [4650] [INFO] Booting worker with pid: 4650
+[2026-02-23 22:46:23 -0300] [4639] [INFO] Worker exiting (pid: 4639)
+[2026-02-23 22:46:23 -0300] [4645] [INFO] Worker exiting (pid: 4645)
+[2026-02-23 22:46:23 -0300] [4649] [INFO] Worker exiting (pid: 4649)
+[2026-02-23 22:46:23 -0300] [4637] [INFO] Handling signal: term
+[2026-02-23 22:46:23 -0300] [4650] [INFO] Worker exiting (pid: 4650)
+[2026-02-23 22:46:23 -0300] [4637] [INFO] Worker (pid:4639) was sent SIGTERM!
+[2026-02-23 22:46:23 -0300] [4637] [INFO] Worker (pid:4645) was sent SIGTERM!
+[2026-02-23 22:46:23 -0300] [4637] [INFO] Worker (pid:4649) was sent SIGTERM!
+[2026-02-23 22:46:23 -0300] [4637] [INFO] Worker (pid:4650) was sent SIGTERM!
+[2026-02-23 22:46:23 -0300] [4637] [INFO] Shutting down: Master

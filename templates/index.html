@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bistaka Lanches - Pedido Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ea1d2c;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --green: #27ae60;
+            --closed: #7f8c8d;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background: var(--light); padding-bottom: 120px; color: var(--dark); }
+        
+        /* Cabeçalho */
+        header { 
+            background: white; padding: 15px; text-align: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 90;
+        }
+        h1 { margin: 0; font-size: 1.4rem; color: var(--dark); }
+        p.loja-desc { margin: 5px 0 0; color: #717171; font-size: 0.85rem; }
+        .status-badge { 
+            padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; 
+            vertical-align: middle; margin-left: 5px; color: white; display: inline-block;
+        }
+        .status-open { background: var(--green); }
+        .status-closed { background: var(--closed); }
+
+        /* Aviso Fechado */
+        #aviso-fechado {
+            background: var(--closed); color: white; text-align: center; padding: 12px;
+            font-weight: bold; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(45, 52, 54, 0.95); backdrop-filter: blur(5px);
+        }
+
+        .container { max-width: 600px; margin: auto; padding: 15px; }
+        
+        /* Categorias */
+        .category-title { 
+            font-size: 1.3rem; font-weight: 800; color: var(--dark); margin: 25px 0 15px; 
+            display: flex; align-items: center;
+        }
+        .category-title::before { content: ''; width: 6px; height: 25px; background: var(--primary); margin-right: 10px; border-radius: 4px; }
+
+        /* Cards de Produto */
+        .item-card {
+            background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; transition: transform 0.1s;
+        }
+        .item-card:active { transform: scale(0.98); }
+        .item-info { flex: 1; padding-right: 15px; }
+        .item-title { font-weight: 600; font-size: 1.05rem; color: var(--dark); margin-bottom: 4px; }
+        .item-desc { font-size: 0.85rem; color: #95a5a6; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        .item-price { color: var(--green); font-weight: 700; margin-top: 8px; display: block; font-size: 1.1rem; }
+        .item-img { width: 90px; height: 90px; border-radius: 10px; object-fit: cover; background: #eee; }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 100; display: none;
+            justify-content: flex-end; align-items: flex-end; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        
+        .modal-content {
+            background: white; width: 100%; max-width: 600px; height: 85vh;
+            border-radius: 25px 25px 0 0; position: relative;
+            margin: auto; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s;
+            overflow: hidden; /* <--- ISSO É A MÁGICA: Impede que o modal inteiro role */
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+        
+        .modal-header-img { width: 100%; height: 220px; object-fit: cover; flex-shrink: 0; }
+        .close-btn { 
+            position: absolute; top: 15px; right: 15px; background: white; border: none; 
+            width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10; font-size: 1.2rem; color: var(--dark);
+        }
+
+        /* O miolo do modal é o único que rola agora */
+        .modal-body { 
+            padding: 25px; 
+            flex: 1; 
+            overflow-y: auto; /* <--- Rolagem isolada aqui */
+            padding-bottom: 40px; /* Um respiro no fim da rolagem */
+        }
+        
+        .addon-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f1f1f1; }
+        .addon-item label { flex: 1; font-weight: 500; color: #555; }
+        .addon-price { color: var(--primary); font-weight: bold; font-size: 0.95rem; }
+        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); margin-left: 15px; }
+
+        /* Rodapé fixo (Sempre visível) */
+        .modal-footer {
+            padding: 20px; border-top: 1px solid #eee; background: white;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.08); /* Sombra para cima separando do conteúdo */
+            position: relative; z-index: 10; flex-shrink: 0;
+        }
+        .qty-selector { display: flex; align-items: center; gap: 15px; font-size: 1.3rem; font-weight: bold; background: #f1f1f1; padding: 5px 15px; border-radius: 30px; }
+        .qty-btn { background: none; border: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; padding: 0 5px; }
+        
+        .add-to-cart-btn {
+            background: var(--primary); color: white; border: none; padding: 15px 25px;
+            border-radius: 12px; font-weight: bold; flex: 1; margin-left: 20px; font-size: 1rem;
+            display: flex; justify-content: space-between; box-shadow: 0 4px 10px rgba(234, 29, 44, 0.3);
+        }
+
+        /* Botão do WhatsApp (Checkout) Fixo também */
+        .btn-whatsapp { 
+            background: #25d366; color: white; width: 100%; padding: 18px; border: none; 
+            border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; 
+            box-shadow: 0 -4px 15px rgba(37, 211, 102, 0.4); /* Sombra para destacar que tá flutuando */
+            position: sticky; bottom: 0; z-index: 20; /* Gruda no fundo da tela de checkout */
+        }
+
+        /* CHECKOUT */
+        .toggle-entrega { display: flex; background: #f1f1f1; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
+        .toggle-btn { 
+            flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; 
+            font-weight: 600; border-radius: 10px; color: #777; transition: all 0.2s;
+        }
+        .toggle-btn.active { background: white; color: var(--dark); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        
+        .geo-btn {
+            background: #fff3cd; color: #856404; border: 1px solid #ffeeba; width: 100%; padding: 12px;
+            border-radius: 8px; font-weight: bold; margin-bottom: 10px; display: flex; 
+            align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .form-control { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e1e1e1; border-radius: 10px; background: #f9f9f9; font-size: 1rem; }
+        .btn-whatsapp { 
+            background: #25d366; color: white; width: 100%; padding: 18px; border: none; 
+            border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Cart Bar */
+        .cart-bar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%);
+            width: 90%; max-width: 550px; background: var(--dark); color: white;
+            padding: 15px 25px; border-radius: 50px; display: flex; justify-content: space-between; 
+            align-items: center; cursor: pointer; z-index: 95; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .cart-bar.visible { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Bistaka Lanches <span id="status-loja" class="status-badge status-open">ABERTO</span></h1>
+    <p class="loja-desc">R. Pé do Cambirela, 175 - Praia do Pontal</p>
+</header>
+
+<div id="aviso-fechado">
+    <div style="font-size: 4rem;">🔒</div>
+    <h2 style="margin: 20px 0 10px;">Estamos Fechados!</h2>
+    <p>Abrimos todos os dias das 19:00 às 23:59.</p>
+</div>
+
+<div class="container" id="menu-container"></div>
+
+<div class="cart-bar" onclick="abrirCheckout()">
+    <div>🛒 <span id="cart-count">0</span></div>
+    <div style="font-weight: bold;">Ver Sacola <span id="cart-total" style="margin-left:10px; color:#f1c40f;">R$ 0,00</span></div>
+</div>
+
+<div class="modal-overlay" id="product-modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="fecharModal()">×</button>
+        <img src="" id="modal-img" class="modal-header-img">
+        <div class="modal-body">
+            <h2 id="modal-title" style="margin:0 0 5px;"></h2>
+            <p id="modal-desc" style="color:#777; margin-bottom:20px; line-height:1.5;"></p>
+            <div id="modal-price" style="font-size:1.6rem; color:var(--green); font-weight:800;"></div>
+            
+            <h3 style="margin-top:25px; font-size:1.1rem;">Adicionais?</h3>
+            <div id="adicionais-container"></div>
+            
+            <h3 style="margin-top:25px; font-size:1.1rem;">Alguma observação?</h3>
+            <textarea id="modal-obs" class="form-control" rows="2" placeholder="Ex: Sem cebola, capricha no molho..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <div class="qty-selector">
+                <button class="qty-btn" onclick="mudarQtd(-1)">-</button>
+                <span id="modal-qtd">1</span>
+                <button class="qty-btn" onclick="mudarQtd(1)">+</button>
+            </div>
+            <button class="add-to-cart-btn" onclick="confirmarAdicao()">
+                <span>Adicionar</span>
+                <span id="btn-total-price">R$ 0,00</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="checkout-modal">
+    <div class="modal-content" style="height: auto; max-height: 90vh;">
+        <div style="padding: 20px; background: white; border-bottom: 1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0;">Seu Pedido</h2>
+            <button class="close-btn" style="position:static; width:30px; height:30px; box-shadow:none; background:#f1f1f1;" onclick="fecharCheckout()">×</button>
+        </div>
+        
+        <div class="modal-body" style="background: #f8f9fa;">
+            <div id="lista-pedido" style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"></div>
+            
+            <div class="toggle-entrega">
+                <button class="toggle-btn active" id="btn-delivery" onclick="mudarTipoEntrega('delivery')">🛵 Entrega</button>
+                <button class="toggle-btn" id="btn-retirada" onclick="mudarTipoEntrega('retirada')">🏃 Retirar no Balcão</button>
+            </div>
+
+            <div id="area-endereco">
+                
+                <button class="geo-btn" onclick="calcularFreteGPS()">
+                    📍 Usar minha localização (GPS)
+                </button>
+                
+                <p style="text-align:center; margin:10px 0; font-size:0.9rem; color:#888;">OU PREENCHA MANUALMENTE:</p>
+
+                <select id="select-bairro" class="form-control" onchange="calcularFreteManual()">
+                    <option value="" disabled selected>Selecione seu Bairro/Região</option>
+                    <option value="3.00">Pontal / Furadinho (R$ 3,00)</option>
+                    <option value="6.00">Enseada do Brito (R$ 6,00)</option>
+                    <option value="8.00">Praia de Fora (R$ 8,00)</option>
+                    <option value="12.50">Pinheira / Mar Aberto (R$ 12,50)</option>
+                    <option value="15.00">Guarda do Embaú (R$ 15,00)</option>
+                    <option value="22.00">Centro Palhoça (R$ 22,00)</option>
+                    <option value="0.00">Outro (A combinar)</option>
+                </select>
+
+                <input type="text" id="endereco" class="form-control" placeholder="Rua, Número e Complemento">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; border-radius: 10px; border: 1px solid #e1e1e1;">
+                    <span>Taxa de Entrega:</span>
+                    <strong id="display-taxa" style="color: var(--primary);">R$ 0,00</strong>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label style="font-weight: bold; margin-bottom: 5px; display: block;">Pagamento:</label>
+                <select id="pagamento" class="form-control">
+                    <option value="" disabled selected>Escolha a forma de pagamento</option>
+                    <option value="Pix">Pix (Chave 48988189822)</option>
+                    <option value="Cartão">Cartão</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                </select>
+            </div>
+
+           <div style="margin-top: 20px;">
+                <label style="font-weight: bold; margin-bottom: 5px; display: block;">Seu Nome:</label>
+                <input type="text" id="nome-cliente" class="form-control" placeholder="Como podemos te chamar?">
+            </div>
+
+            <div style="margin-top: 10px;">
+                <label style="font-weight: bold; margin-bottom: 5px; display: block;">Seu WhatsApp (Para contato):</label>
+                <input type="tel" id="telefone-cliente" class="form-control" placeholder="DDD + Número (ex: 48999999999)">
+            </div>
+
+            <button class="btn-whatsapp" onclick="enviarWhatsapp()">Finalizar Pedido</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURAÇÃO DA LOJA ---
+    const LOJA_COORDS = { lat: -27.69838, lng: -48.63380 }; 
+    const WHATSAPP_NUM = "5548988189822"; 
+    const HORA_ABERTURA = 1;
+    const HORA_FECHAMENTO = 23;
+
+    // --- TABELA DE FRETE (Para GPS) ---
+    const TABELA_FRETE = [
+        { km: 0.5, valor: 3.00 },
+        { km: 1.5, valor: 4.00 },
+        { km: 3.0, valor: 6.00 },
+        { km: 4.0, valor: 7.00 },
+        { km: 5.0, valor: 8.00 },
+        { km: 6.0, valor: 12.50 },
+        { km: 10.0, valor: 15.00 },
+        { km: 20.0, valor: 22.00 }
+    ];
+
+    let carrinho = [];
+    let itemAtual = null;
+    let qtdAtual = 1;
+    let tipoEntrega = 'delivery';
+    let taxaEntrega = 0;
+    let bairroSelecionado = '';
+
+    // --- CARDÁPIO ---
+    let menu = [];
+    // Busca os dados do Python assim que a página carrega
+    async function carregarMenu() {
+        try {
+            const response = await fetch('/api/cardapio');
+            const dados = await response.json();
+            const categorias = {};
+            dados.forEach(item => {
+                if (!categorias[item.categoria]) {
+                    categorias[item.categoria] = { categoria: item.categoria, itens: [] };
+                }
+                if (!item.adicionais) {
+                    item.adicionais = []; 
+                    }
+                categorias[item.categoria].itens.push(item);
+            });
+            
+            menu = Object.values(categorias);
+            renderizarMenu(); // Chama a função de desenhar na tela
+        } catch (error) {
+            console.error("Erro ao carregar cardápio:", error);
+            alert("Erro ao carregar o cardápio. Tente recarregar a página.");
+        }
+    }
+
+  window.onload = function() {
+
+        verificarHorario();
+        carregarMenu(); 
+        
+
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            document.getElementById('aviso-https').style.display = 'block';
+        }
+
+    };
+
+    function verificarHorario() {
+        const agora = new Date();
+        const hora = agora.getHours();
+        if (hora >= HORA_ABERTURA && hora <= HORA_FECHAMENTO) {
+            document.getElementById('status-loja').innerText = "ABERTO";
+            document.getElementById('status-loja').className = "status-badge status-open";
+            document.getElementById('aviso-fechado').style.display = 'none';
+        } else {
+            document.getElementById('status-loja').innerText = "FECHADO";
+            document.getElementById('status-loja').className = "status-badge status-closed";
+            document.getElementById('aviso-fechado').style.display = 'flex';
+        }
+    }
+
+    function renderizarMenu() {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = '';
+        menu.forEach(cat => {
+            container.innerHTML += `<div class="category-title">${cat.categoria}</div>`;
+            cat.itens.forEach(item => {
+                container.innerHTML += `
+                    <div class="item-card" onclick="abrirModal(${item.id})">
+                        <div class="item-info">
+                            <div class="item-title">${item.nome}</div>
+                            <div class="item-desc">${item.desc}</div>
+                            <div class="item-price">R$ ${item.preco.toFixed(2)}</div>
+                        </div>
+                        <img src="${item.img}" class="item-img">
+                    </div>`;
+            });
+        });
+    }
+
+    // --- CARRINHO ---
+    function abrirModal(id) {
+        const item = menu.flatMap(c => c.itens).find(i => i.id === id);
+        itemAtual = item;
+        qtdAtual = 1;
+        document.getElementById('modal-img').src = item.img;
+        document.getElementById('modal-title').innerText = item.nome;
+        document.getElementById('modal-desc').innerText = item.desc;
+        document.getElementById('modal-price').innerText = `R$ ${item.preco.toFixed(2)}`;
+        document.getElementById('modal-qtd').innerText = 1;
+        document.getElementById('modal-obs').value = '';
+        
+        const addContainer = document.getElementById('adicionais-container');
+        addContainer.innerHTML = '';
+        if(item.adicionais.length) {
+            item.adicionais.forEach(add => {
+                addContainer.innerHTML += `
+                    <div class="addon-item">
+                        <label><input type="checkbox" data-nome="${add.nome}" data-preco="${add.preco}" onchange="calcTotal()"> ${add.nome}</label>
+                        <span class="addon-price">+ R$ ${add.preco.toFixed(2)}</span>
+                    </div>`;
+            });
+        } else {
+            addContainer.innerHTML = '<p style="color:#999; font-size:0.9rem;">Sem adicionais disponíveis.</p>';
+        }
+        calcTotal();
+        document.getElementById('product-modal').classList.add('open');
+    }
+
+    function fecharModal() { document.getElementById('product-modal').classList.remove('open'); }
+    function mudarQtd(d) { if(qtdAtual + d >= 1) { qtdAtual += d; document.getElementById('modal-qtd').innerText = qtdAtual; calcTotal(); } }
+    
+    function calcTotal() {
+        let totalAdd = 0;
+        document.querySelectorAll('#adicionais-container input:checked').forEach(el => totalAdd += parseFloat(el.getAttribute('data-preco')));
+        let total = (itemAtual.preco + totalAdd) * qtdAtual;
+        document.getElementById('btn-total-price').innerText = `R$ ${total.toFixed(2)}`;
+    }
+
+    function confirmarAdicao() {
+        let adds = [];
+        let totalAdd = 0;
+        document.querySelectorAll('#adicionais-container input:checked').forEach(el => {
+            adds.push(el.getAttribute('data-nome'));
+            totalAdd += parseFloat(el.getAttribute('data-preco'));
+        });
+        carrinho.push({
+            nome: itemAtual.nome,
+            qtd: qtdAtual,
+            adds: adds,
+            obs: document.getElementById('modal-obs').value,
+            total: (itemAtual.preco + totalAdd) * qtdAtual
+        });
+        fecharModal();
+        atualizarBarra();
+    }
+
+    function removerItem(index) {
+        carrinho.splice(index, 1); 
+        atualizarBarra();
+        if (carrinho.length === 0) fecharCheckout();
+        else abrirCheckout();
+    }
+
+    function atualizarBarra() {
+        const count = carrinho.reduce((acc, i) => acc + i.qtd, 0);
+        const total = carrinho.reduce((acc, i) => acc + i.total, 0);
+        document.getElementById('cart-count').innerText = count;
+        document.getElementById('cart-total').innerText = `R$ ${total.toFixed(2)}`;
+        document.querySelector('.cart-bar').classList.toggle('visible', count > 0);
+    }
+
+    // --- CHECKOUT & FRETE ---
+    function abrirCheckout() {
+        const lista = document.getElementById('lista-pedido');
+        lista.innerHTML = '';
+        carrinho.forEach((item, index) => {
+            lista.innerHTML += `
+                <div style="border-bottom:1px dashed #eee; padding-bottom:10px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><span style="font-weight:bold;">${item.qtd}x ${item.nome}</span></div>
+                        <div style="display:flex; align-items:center;">
+                            <span style="font-weight:bold;">R$ ${item.total.toFixed(2)}</span>
+                            <button onclick="removerItem(${index})" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:10px;">🗑️</button>
+                        </div>
+                    </div>
+                    ${item.adds.length ? `<small style="color:#777;">+ ${item.adds.join(', ')}</small><br>` : ''}
+                    ${item.obs ? `<small style="color:#e67e22;">Obs: ${item.obs}</small>` : ''}
+                </div>`;
+        });
+        document.getElementById('checkout-modal').classList.add('open');
+    }
+
+    function fecharCheckout() { document.getElementById('checkout-modal').classList.remove('open'); }
+
+    function mudarTipoEntrega(tipo) {
+        tipoEntrega = tipo;
+        document.getElementById('btn-delivery').classList.toggle('active', tipo === 'delivery');
+        document.getElementById('btn-retirada').classList.toggle('active', tipo === 'retirada');
+        
+        if (tipo === 'retirada') {
+            document.getElementById('area-endereco').style.display = 'none';
+            taxaEntrega = 0;
+            bairroSelecionado = 'Retirada no Local';
+        } else {
+            document.getElementById('area-endereco').style.display = 'block';
+            document.getElementById('display-taxa').innerText = 'A calcular';
+        }
+    }
+
+    function calcularFreteManual() {
+        const select = document.getElementById('select-bairro');
+        const valor = parseFloat(select.value);
+        const nomeBairro = select.options[select.selectedIndex].text;
+        
+        taxaEntrega = valor;
+        bairroSelecionado = nomeBairro;
+        document.getElementById('display-taxa').innerText = `R$ ${taxaEntrega.toFixed(2)}`;
+        
+        // Limpa campo GPS se usar manual
+        document.querySelector('.geo-btn').innerText = "📍 Usar minha localização (GPS)";
+        document.querySelector('.geo-btn').style.background = "#fff3cd";
+    }
+
+    // --- GPS ---
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        var R = 6371; 
+        var dLat = deg2rad(lat2-lat1);
+        var dLon = deg2rad(lon2-lon1); 
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        return R * c;
+    }
+    function deg2rad(deg) { return deg * (Math.PI/180); }
+
+    function calcularFreteGPS() {
+        if (!navigator.geolocation) return alert("Seu navegador não suporta GPS.");
+        document.querySelector('.geo-btn').innerText = "⏳ Localizando...";
+        
+        navigator.geolocation.getCurrentPosition(position => {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            const dist = getDistanceFromLatLonInKm(userLat, userLng, LOJA_COORDS.lat, LOJA_COORDS.lng);
+            
+            let valorFrete = null;
+            for (let faixa of TABELA_FRETE) {
+                if (dist <= faixa.km) {
+                    valorFrete = faixa.valor;
+                    break;
+                }
+            }
+
+            if (valorFrete !== null) {
+                taxaEntrega = valorFrete;
+                bairroSelecionado = `GPS (${dist.toFixed(1)}km)`;
+                document.getElementById('display-taxa').innerText = `R$ ${valorFrete.toFixed(2)}`;
+                document.getElementById('endereco').value = `Minha Localização (${dist.toFixed(1)}km)`;
+                document.querySelector('.geo-btn').innerText = "✅ Localizado!";
+                document.querySelector('.geo-btn').style.background = "#27ae60";
+                
+                // Reseta o select manual
+                document.getElementById('select-bairro').value = "";
+            } else {
+                alert("Você está muito longe (mais de 20km).");
+            }
+        }, error => {
+            alert("Erro ao pegar localização. Tente selecionar o Bairro manualmente.");
+            document.querySelector('.geo-btn').innerText = "📍 Tentar GPS Novamente";
+        });
+}
+
+async function enviarWhatsapp() {
+        const pag = document.getElementById('pagamento').value;
+        const endereco = document.getElementById('endereco').value;
+        const telefone = document.getElementById('telefone-cliente').value.replace(/\D/g,''); // Remove traços/espaços
+        const nomeCliente = document.getElementById('nome-cliente').value;
+        const selectBairro = document.getElementById('select-bairro') ? document.getElementById('select-bairro').value : null;
+        
+        // --- VALIDAÇÕES ---
+        if (!nomeCliente || nomeCliente.length < 2) return alert("Por favor, digite seu nome.");
+        if (!telefone || telefone.length < 10) return alert("Por favor, digite seu WhatsApp corretamente!");
+        if (tipoEntrega === 'delivery' && (!endereco || endereco.length < 3)) return alert("Informe seu endereço!");
+        if (!pag) return alert("Selecione a forma de pagamento.");
+
+        // --- PREPARAÇÃO DO TEXTO DO ZAP ---
+        let textoZap = `*PEDIDO BISTAKA*\n----------------\n`;
+        textoZap += `👤 *Cliente:* ${nomeCliente}\n`;
+        textoZap += `------------------------------\n`;
+        let resumoItens = "";
+        
+        carrinho.forEach(item => {
+            textoZap += `${item.qtd}x *${item.nome}*\n`;
+            
+            // Monta a string para o banco de dados
+            let itemDb = `${item.qtd}x ${item.nome}`;
+            
+            if(item.adds.length) {
+                textoZap += `+ ${item.adds.join(', ')}\n`;
+                itemDb += ` (+ ${item.adds.join(', ')})`; // Add no banco
+            }
+            if(item.obs) {
+                textoZap += `_Obs: ${item.obs}_\n`;
+                itemDb += ` [Obs: ${item.obs}]`; // Add no banco
+            }
+            
+            textoZap += `R$ ${item.total.toFixed(2)}\n\n`;
+            
+            // Quebra de linha para separar os lanches no painel da cozinha
+            resumoItens += itemDb + "\n"; 
+        });
+
+        const totalProdutos = carrinho.reduce((acc, i) => acc + i.total, 0);
+        let totalFinal = totalProdutos + (tipoEntrega === 'delivery' ? taxaEntrega : 0);
+
+        textoZap += `----------------\n`;
+        
+        let bairroDb = "";
+        if (tipoEntrega === 'retirada') {
+            textoZap += `*Entrega:* Retirada (Grátis)\n`;
+            bairroDb = "Retirada";
+        } else {
+            textoZap += `*Entrega:* R$ ${taxaEntrega.toFixed(2)}\n`;
+            textoZap += `📍 *Endereço:* ${endereco}\n`;
+            bairroDb = bairroSelecionado;
+        }
+        
+        textoZap += `*TOTAL: R$ ${totalFinal.toFixed(2)}*\n`;
+        textoZap += `💳 *Pag:* ${pag}`;
+
+        // --- SALVAR NO BANCO DE DADOS (NOVO!) ---
+        const btn = document.querySelector('.btn-whatsapp');
+        const textoOriginal = btn.innerText;
+        btn.innerText = "⏳ Processando...";
+        btn.disabled = true;
+
+        try {
+            await fetch('/api/salvar_pedido', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    telefone: telefone,
+                    nome: nomeCliente,
+                    endereco: endereco,
+                    bairro: bairroDb,
+                    total: totalFinal,
+                    pagamento: pag,
+                    resumo_itens: resumoItens
+                })
+            });
+        } catch (error) {
+            console.error("Erro ao salvar, mas vamos abrir o whats mesmo assim", error);
+        }
+
+        // --- ABRE O WHATSAPP ---
+        btn.innerText = textoOriginal;
+        btn.disabled = false;
+       const linkWhatsApp = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(textoZap)}`;
+        window.location.href = linkWhatsApp;
+    }
+</script>
+</html>

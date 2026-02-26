@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cozinha & Caixa</title>
+    <style>
+        /* ESTILO DA TELA DO PC (Monitor) */
+        body { font-family: 'Segoe UI', sans-serif; background: #ffffff; padding: 20px; margin: 0; }
+        
+        .painel-container {
+            max-width: 1000px; margin: auto; background: white; 
+            border-radius: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: 90vh; display: flex; flex-direction: column;
+        }
+
+        h1 { margin: 0 0 20px; display: flex; justify-content: space-between; align-items: center; color: #333; }
+        .btn-refresh { font-size: 1rem; cursor: pointer; background: #eee; border: none; padding: 10px; border-radius: 5px; }
+
+        /* Lista de Pedidos (Scroll) */
+        .lista-pedidos { flex: 1; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; }
+        
+        .card-pedido {
+            border-bottom: 1px solid #eee; padding: 15px; display: flex; 
+            justify-content: space-between; align-items: center;
+            transition: background 0.2s;
+        }
+        .card-pedido:hover { background: #f9f9f9; }
+        .card-pedido.novo { background: #e8f5e9; border-left: 5px solid #2ecc71; } /* Destaque verde para novos */
+
+        .info-pedido h3 { margin: 0; font-size: 1.2rem; color: #333; }
+        .info-pedido p { margin: 5px 0 0; color: #666; font-size: 0.95rem; }
+        .hora-badge { background: #333; color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; }
+
+        .btn-imprimir {
+            background: #333; color: white; border: none; padding: 10px 20px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .btn-imprimir:hover { background: #000; }
+
+        /* --- MÁGICA DA IMPRESSÃO TÉRMICA (80mm) --- */
+        #cupom-fiscal { display: none; } /* Esconde na tela normal */
+
+        @media print {
+            /* Esconde TUDO da tela do PC */
+            body * { visibility: hidden; }
+            .painel-container, .btn-imprimir { display: none; }
+
+            /* Mostra SÓ o cupom */
+            #cupom-fiscal, #cupom-fiscal * {
+                visibility: visible; display: block;
+            }
+            
+            #cupom-fiscal {
+                position: absolute; left: 0; top: 0; width: 80mm; /* Largura padrão térmica */
+                font-family: 'Courier New', monospace; /* Fonte tipo recibo */
+                font-size: 12px; line-height: 1.2; padding: 0; margin: 0;
+                color: black;
+            }
+
+            /* Formatação do Recibo */
+            .recibo-header { text-align: center; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
+            .recibo-body { margin-bottom: 10px; border-bottom: 1px dashed black; padding-bottom: 5px; }
+            .recibo-item { display: flex; justify-content: space-between; }
+            .recibo-total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px; }
+            .recibo-footer { text-align: center; font-size: 10px; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="painel-container">
+    <h1>
+        <span>🖥️ Pedidos - Cozinha</span>
+        <button class="btn-refresh" onclick="buscarPedidos()">🔄 Atualizar</button>
+    </h1>
+    
+    <div class="lista-pedidos" id="lista">
+        <div style="padding: 20px; text-align: center; color: #999;">Carregando pedidos...</div>
+    </div>
+</div>
+
+<div id="cupom-fiscal">
+    </div>
+
+<script>
+    // Configurações
+    let ultimoId = 0;
+
+    // Toca um som quando chega pedido novo (opcional)
+    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+    async function buscarPedidos() {
+        try {
+            const response = await fetch('/api/pedidos_hoje');
+            const pedidos = await response.json();
+            
+            const lista = document.getElementById('lista');
+            lista.innerHTML = ''; // Limpa e refaz (poderia ser otimizado, mas pra local tá ótimo)
+
+            // Verifica se tem pedido novo para tocar som
+            if (pedidos.length > 0 && pedidos[0].id > ultimoId) {
+                if (ultimoId !== 0) audio.play(); // Toca só se não for o primeiro load
+                ultimoId = pedidos[0].id;
+            }
+
+            pedidos.forEach(p => {
+                const itensFormatadosTela = p.itens.replace(/\n/g, '<br>');
+                const infoEndereco = (p.bairro === 'Retirada' || !p.endereco) 
+                    ? `<p style="color:#e67e22; font-weight:bold;">🏃 Retirada no Balcão</p>` 
+                    : `<p><strong>📍 Entrega:</strong> ${p.endereco} (${p.bairro})</p>`;
+                    
+                lista.innerHTML += `
+                    <div class="card-pedido ${p.id === ultimoId ? 'novo' : ''}">
+                        <div class="info-pedido">
+                            <h3><span class="hora-badge">${p.hora}</span> Pedido #${p.id}</h3>
+                            <p><strong>👤 Cliente:</strong> ${p.nome} <br><small>📞 Tel: ${p.cliente}</small></p>
+                            ${infoEndereco}
+                            
+                            <p style="margin-top: 10px; background: #f1f1f1; padding: 10px; border-radius: 5px; font-size: 0.9rem;">
+                                ${itensFormatadosTela}
+                            </p>
+                            
+                            <p style="color: green; font-weight:bold; margin-top: 10px;">Total: R$ ${p.total.toFixed(2)} (${p.pagamento})</p>
+                        </div>
+                        <button class="btn-imprimir" onclick='imprimirComanda(${JSON.stringify(p)})'>
+                            🖨️ Imprimir
+                        </button>
+                    </div>
+                `;
+            });
+
+        } catch (error) {
+            console.error("Erro ao buscar pedidos:", error);
+        }
+    }
+
+    function imprimirComanda(p) {
+        // 1. Preenche o HTML do Cupom Oculto
+        const cupom = document.getElementById('cupom-fiscal');
+        
+      let itensHtml = p.itens ? p.itens.trim().split('\n').map(linha => {
+            if(linha) return `<div class="recibo-item" style="margin-bottom: 5px;"><span>${linha}</span></div>`;
+            return '';
+        }).join('') : '';
+
+        // Formata o endereço para a impressora
+        const enderecoPrint = (p.bairro === 'Retirada' || !p.endereco)
+            ? `<div style="text-align:center; font-weight:bold; margin: 5px 0; border: 1px solid black; padding: 2px;">RETIRADA NO BALCÃO</div>`
+            : `<div><strong>Endereço:</strong> ${p.endereco}<br><strong>Bairro:</strong> ${p.bairro}</div>`;
+
+        cupom.innerHTML = `
+            <div class="recibo-header">
+                <strong>BISTAKA LANCHES</strong><br>
+                --------------------------------<br>
+                PEDIDO #${p.id} - ${p.hora}<br>
+                --------------------------------
+            </div>
+            <div class="recibo-body">
+                <div><strong>Cliente:</strong> ${p.nome}</div>
+                <div><strong>Telefone:</strong> ${p.cliente}</div>
+                ${enderecoPrint}
+                <br>
+                <strong>ITENS:</strong><br>
+                ${itensHtml}
+            </div>
+            <div class="recibo-total">
+                TOTAL: R$ ${p.total.toFixed(2)}
+            </div>
+            <div style="text-align:right; font-size:12px;">
+                Pagamento: ${p.pagamento}
+            </div>
+            <div class="recibo-footer">
+                Obrigado pela preferência!<br>
+                 www.bistaka.com.br
+            <br>
+            
+            </div>
+        `;
+
+        window.print();
+    }
+
+    // Atualiza a cada 10 segundos
+    setInterval(buscarPedidos, 10000);
+    
+    // Busca na hora que abre
+    buscarPedidos();
+</script>
+
+</body>
+</html>

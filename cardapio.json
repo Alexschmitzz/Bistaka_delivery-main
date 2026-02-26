@@ -1,0 +1,134 @@
+[
+    {
+        "id": 5,
+        "categoria": "Combos",
+        "nome": "Combo casal X-Salada",
+        "desc": "2 X-Saladas",
+        "preco": 49.9,
+        "img": "/static/uploads/Combo_casal_X-Salada.jfif",
+        "adicionais": []
+    },
+    {
+        "id": 6,
+        "categoria": "Combos",
+        "nome": "Combo Casal Fit",
+        "desc": "2 Smash Ligth",
+        "preco": 44.99,
+        "img": "/static/uploads/Combo_Casal_Fit.jfif",
+        "adicionais": [
+            {
+                "nome": "Pão Roseta",
+                "preco": 0.0
+            },
+            {
+                "nome": "Pão Brioche",
+                "preco": 0.0
+            },
+            {
+                "nome": "muçarela",
+                "preco": 0.0
+            },
+            {
+                "nome": "cheddar",
+                "preco": 0.0
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "categoria": "Lanches",
+        "nome": "X-Coração",
+        "desc": "Hambúrguer com 130g, presunto, mussarela, 100g de coração suculento, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha. Um sabor único e irresistível.",
+        "preco": 33.0,
+        "img": "https://client-assets.anota.ai/produtos/685f1134f6e78e001924171d/-1753238454818blob_600.webp",
+        "ativo": true
+    },
+    {
+        "id": 8,
+        "categoria": "Lanches",
+        "nome": " X-Salada",
+        "desc": "Um hambúrguer de 130g, presunto, mussarela, alface fresca, tomate, picles, milho, ervilha, maionese, ketchup e batata palha",
+        "preco": 26.0,
+        "img": "/static/uploads/salada.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 4,
+        "categoria": "Lanches",
+        "nome": " X-Dog",
+        "desc": "Um lanche único com hambúrguer, presunto, mussarela, 2 salsichas saborosa, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha. Uma experiência deliciosa.",
+        "preco": 30.0,
+        "img": "https://client-assets.anota.ai/produtos/685f1134f6e78e001924171d/-1753238382581blob_600.webp"
+    },
+    {
+        "id": 9,
+        "categoria": "Lanches",
+        "nome": "X-Galinha",
+        "desc": "Hambúrguer de 130g suculento com presunto, mussarela, frango, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha. Uma delícia que você não pode perder.",
+        "preco": 33.0,
+        "img": "/static/uploads/X-Galinha.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 10,
+        "categoria": "Lanches",
+        "nome": " X-Calabresa",
+        "desc": "Delicie-se com um hambúrguer de 130g saboroso, presunto, mussarela, calabresa, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha. Uma combinação perfeita.",
+        "preco": 31.0,
+        "img": "/static/uploads/xcalabresa.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 7,
+        "categoria": "Lanches",
+        "nome": " Smash Duplo",
+        "desc": "Pão Brioche ou Roseta .\r\n2 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese .",
+        "preco": 30.0,
+        "img": "/static/uploads/Smash_Duplo.jpg",
+        "adicionais": [
+            {
+                "nome": "Pão Roseta",
+                "preco": 0.0
+            },
+            {
+                "nome": "Pão Brioche",
+                "preco": 0.0
+            },
+            {
+                "nome": "Queijo muçarela",
+                "preco": 0.0
+            },
+            {
+                "nome": "Queijo cheddar",
+                "preco": 1.0
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "categoria": "Lanches",
+        "nome": "X-Egg",
+        "desc": "Hambúrguer 130g, presunto, mussarela, ovo, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha. Uma combinação clássica e deliciosa.",
+        "preco": 28.0,
+        "img": "/static/uploads/X-Egg.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 12,
+        "categoria": "Lanches",
+        "nome": "X-Burguer",
+        "desc": "Hambúrguer 130g, presunto, muçarela, maionese e Ketchup.",
+        "preco": 20.0,
+        "img": "/static/uploads/X-Burguer.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 2,
+        "categoria": "Bebidas",
+        "nome": "Coca-Cola Lata",
+        "desc": "350ml gelada.",
+        "preco": 6.0,
+        "img": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500",
+        "ativo": true
+    }
+]

@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from datetime import datetime
 import json
 import os
+import requests
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -115,13 +116,36 @@ def salvar_pedido():
             VALUES (?, ?, ?, ?, ?)
         ''', (telefone, itens_texto, total, agora, pagamento))
 
+        # Salva tudo no banco de dados e fecha a conexão
         conn.commit()
         conn.close()
-        return jsonify({"status": "sucesso", "msg": "Pedido salvo!"})
-    except Exception as e:
-        print(f"Erro ao salvar pedido: {e}")
-        return jsonify({"status": "erro", "msg": str(e)}), 500
+        
+        # ==========================================
+        # 3. MANDA O AVISO PARA O N8N (WHATSAPP)
+        # ==========================================
+        try:
+            # Coloque aqui a URL do seu Webhook do n8n
+            url_n8n = "http://192.168.2.194:5678/webhook-test/467e9f1e-f453-4875-ac2b-a5cdb625a32c"
+            
+            payload_n8n = {
+                "nome": nome,
+                "telefone": telefone,
+                "resumo": itens_texto
+            }
+            
+            # Dispara a informação sem travar o site
+            requests.post(url_n8n, json=payload_n8n, timeout=3)
+            
+        except Exception as e:
+            print(f"Erro ao avisar o n8n: {e}")
+        # ==========================================    
 
+        # 4. SUCESSO FINAL! Só retorna depois que fizer tudo.
+        return jsonify({"status": "sucesso", "msg": "Pedido salvo e enviado!"})
+
+    except Exception as e:
+        print(f"Erro no servidor: {e}")
+        return jsonify({"status": "erro", "msg": "Falha ao processar o pedido"}), 500
 # --- ROTAS ADMINISTRATIVAS ---
 
 # ROTA 4: Login

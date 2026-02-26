@@ -134,7 +134,7 @@ def salvar_pedido():
             }
             
             # Dispara a informação sem travar o site
-            requests.post(url_n8n, json=payload_n8n, timeout=3)
+            request.post(url_n8n, json=payload_n8n, timeout=3)
             
         except Exception as e:
             print(f"Erro ao avisar o n8n: {e}")

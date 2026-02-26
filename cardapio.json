@@ -50,7 +50,8 @@
         "desc": "Um hambúrguer de 130g, presunto, mussarela, alface fresca, tomate, picles, milho, ervilha, maionese, ketchup e batata palha",
         "preco": 26.0,
         "img": "/static/uploads/salada.jpg",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": true
     },
     {
         "id": 4,
@@ -120,6 +121,15 @@
         "desc": "Hambúrguer 130g, presunto, muçarela, maionese e Ketchup.",
         "preco": 20.0,
         "img": "/static/uploads/X-Burguer.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 13,
+        "categoria": "Lanches",
+        "nome": "X-Coração",
+        "desc": "Hambúrguer com 130g, presunto, mussarela, 100g de coração suculento, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha.",
+        "preco": 33.0,
+        "img": "/static/uploads/IMG_9498.webp",
         "adicionais": []
     },
     {

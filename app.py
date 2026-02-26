@@ -299,6 +299,35 @@ def mudar_status(pedido_id):
         
     return jsonify({'status': 'sucesso'})
 
+@app.route('/admin/relatorio')
+def relatorio_caixa():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    # Busca apenas os pedidos de HOJE que já foram FINALIZADOS (entregues)
+    cursor = conn.execute('''
+        SELECT total, metodo_pagamento FROM pedidos
+        WHERE date(data_pedido) = date('now', 'localtime')
+        AND status = 'finalizado'
+    ''')
+    pedidos_hoje = cursor.fetchall()
+    conn.close()
+
+    qtd_pedidos = len(pedidos_hoje)
+    total_bruto = sum(p['total'] for p in pedidos_hoje)
+    
+    # Separa os valores procurando o nome da forma de pagamento
+    total_pix = sum(p['total'] for p in pedidos_hoje if 'Pix' in p['metodo_pagamento'] or 'pix' in p['metodo_pagamento'])
+    total_cartao = sum(p['total'] for p in pedidos_hoje if 'Cartão' in p['metodo_pagamento'] or 'cartao' in p['metodo_pagamento'])
+    total_dinheiro = sum(p['total'] for p in pedidos_hoje if 'Dinheiro' in p['metodo_pagamento'] or 'dinheiro' in p['metodo_pagamento'])
+
+    return render_template('relatorio.html', 
+                           qtd=qtd_pedidos, 
+                           bruto=total_bruto, 
+                           pix=total_pix, 
+                           cartao=total_cartao, 
+                           dinheiro=total_dinheiro)
+
 if __name__ == '__main__':
     # Roda acessível na rede local
     app.run(host='0.0.0.0', port=5000, debug=True)

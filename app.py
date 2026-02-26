@@ -285,8 +285,7 @@ def dashboard():
 
 @app.route('/api/mudar_status/<int:pedido_id>', methods=['POST'])
 def mudar_status(pedido_id):
-    if 'admin_logado' not in session:
-        return jsonify({'erro': 'Não autorizado'}), 403
+    if not session.get('logged_in'): return redirect(url_for('login'))
 
     dados = request.json
     novo_status = dados.get('status')

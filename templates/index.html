@@ -228,11 +228,12 @@
                 <select id="select-bairro" class="form-control" onchange="calcularFreteManual()">
                     <option value="" disabled selected>Selecione seu Bairro/Região</option>
                     <option value="3.00">Pontal / Furadinho (R$ 3,00)</option>
-                    <option value="6.00">Enseada do Brito (R$ 6,00)</option>
+                    <option value="7.00">Ponto de Parada BR 101 (R$ 7,00)</option>
                     <option value="8.00">Praia de Fora (R$ 8,00)</option>
-                    <option value="12.50">Pinheira / Mar Aberto (R$ 12,50)</option>
-                    <option value="15.00">Guarda do Embaú (R$ 15,00)</option>
+                    <option value="9.00">Enseada do Brito (R$ 9,00)</option>
+                    <option value="12.50">Guarda do Cobatão (R$ 12,50)</option>
                     <option value="22.00">Centro Palhoça (R$ 22,00)</option>
+                    <option value="22.00">Pinheira / Mar Aberto (R$ 22,00)</option>
                     <option value="0.00">Outro (A combinar)</option>
                 </select>
 
@@ -271,7 +272,7 @@
 
 <script>
     // --- CONFIGURAÇÃO DA LOJA ---
-    const LOJA_COORDS = { lat: -27.69838, lng: -48.63380 }; 
+    const LOJA_COORDS = { lat: -27.720884, lng: -48.644503 }; 
     const WHATSAPP_NUM = "5548988189822"; 
     const HORA_ABERTURA = 1;
     const HORA_FECHAMENTO = 23;
@@ -279,13 +280,13 @@
     // --- TABELA DE FRETE (Para GPS) ---
     const TABELA_FRETE = [
         { km: 0.5, valor: 3.00 },
-        { km: 1.5, valor: 4.00 },
-        { km: 3.0, valor: 6.00 },
-        { km: 4.0, valor: 7.00 },
-        { km: 5.0, valor: 8.00 },
-        { km: 6.0, valor: 12.50 },
-        { km: 10.0, valor: 15.00 },
-        { km: 20.0, valor: 22.00 }
+        { km: 1.5, valor: 5.00 },
+        { km: 3.0, valor: 7.00 },
+        { km: 4.0, valor: 8.00 },
+        { km: 5.0, valor: 9.00 },
+        { km: 6.0, valor: 15.00 },
+        { km: 10.0, valor: 22.00 },
+        { km: 20.0, valor: 30.00 }
     ];
 
     let carrinho = [];

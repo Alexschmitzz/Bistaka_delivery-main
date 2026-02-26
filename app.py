@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from datetime import datetime
 import json
 import os
-import requests
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -61,6 +60,7 @@ def load_cardapio():
 def save_cardapio(data):
     with open(CARDAPIO_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+
 
 # --- ROTAS PÚBLICAS (CLIENTE) ---
 
@@ -302,6 +302,21 @@ def api_pedidos_hoje():
 def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login'))
     return render_template('dashboard.html')
+
+@app.route('/api/mudar_status/<int:pedido_id>', methods=['POST'])
+def mudar_status(pedido_id):
+    if 'admin_logado' not in session:
+        return jsonify({'erro': 'Não autorizado'}), 403
+
+    dados = request.json
+    novo_status = dados.get('status')
+    
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE pedidos SET status = ? WHERE id = ?", (novo_status, pedido_id))
+        conn.commit()
+        
+    return jsonify({'status': 'sucesso'})
 
 if __name__ == '__main__':
     # Roda acessível na rede local

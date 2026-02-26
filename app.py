@@ -42,6 +42,10 @@ def init_db():
                 FOREIGN KEY(cliente_telefone) REFERENCES clientes(telefone)
             )
         ''')
+        try:
+            cursor.execute("ALTER TABLE pedidos ADD COLUMN status TEXT DEFAULT 'producao'")
+        except:
+            pass 
         conn.commit()
 
 # Inicializa o banco ao iniciar o app
@@ -60,7 +64,6 @@ def load_cardapio():
 def save_cardapio(data):
     with open(CARDAPIO_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
-
 
 # --- ROTAS PÚBLICAS (CLIENTE) ---
 
@@ -116,36 +119,13 @@ def salvar_pedido():
             VALUES (?, ?, ?, ?, ?)
         ''', (telefone, itens_texto, total, agora, pagamento))
 
-        # Salva tudo no banco de dados e fecha a conexão
         conn.commit()
         conn.close()
-        
-        # ==========================================
-        # 3. MANDA O AVISO PARA O N8N (WHATSAPP)
-        # ==========================================
-        try:
-            # Coloque aqui a URL do seu Webhook do n8n
-            url_n8n = "http://192.168.2.194:5678/webhook-test/467e9f1e-f453-4875-ac2b-a5cdb625a32c"
-            
-            payload_n8n = {
-                "nome": nome,
-                "telefone": telefone,
-                "resumo": itens_texto
-            }
-            
-            # Dispara a informação sem travar o site
-            request.post(url_n8n, json=payload_n8n, timeout=3)
-            
-        except Exception as e:
-            print(f"Erro ao avisar o n8n: {e}")
-        # ==========================================    
-
-        # 4. SUCESSO FINAL! Só retorna depois que fizer tudo.
-        return jsonify({"status": "sucesso", "msg": "Pedido salvo e enviado!"})
-
+        return jsonify({"status": "sucesso", "msg": "Pedido salvo!"})
     except Exception as e:
-        print(f"Erro no servidor: {e}")
-        return jsonify({"status": "erro", "msg": "Falha ao processar o pedido"}), 500
+        print(f"Erro ao salvar pedido: {e}")
+        return jsonify({"status": "erro", "msg": str(e)}), 500
+
 # --- ROTAS ADMINISTRATIVAS ---
 
 # ROTA 4: Login
@@ -293,7 +273,9 @@ def api_pedidos_hoje():
             "itens": p["itens"],
             "total": p["total"],
             "hora": p["data_pedido"][11:16],
-            "pagamento": p["metodo_pagamento"]
+            "pagamento": p["metodo_pagamento"],
+            "status": p["status"],
+
         })
     return jsonify(lista_pedidos)
 
@@ -305,8 +287,7 @@ def dashboard():
 
 @app.route('/api/mudar_status/<int:pedido_id>', methods=['POST'])
 def mudar_status(pedido_id):
-    if 'admin_logado' not in session:
-        return jsonify({'erro': 'Não autorizado'}), 403
+    if not session.get('logged_in'): return redirect(url_for('login'))
 
     dados = request.json
     novo_status = dados.get('status')

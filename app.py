@@ -287,7 +287,7 @@ def dashboard():
 
 @app.route('/api/mudar_status/<int:pedido_id>', methods=['POST'])
 def mudar_status(pedido_id):
-   # if not session.get('logged_in'): return redirect(url_for('login'))
+    if not session.get('logged_in'): return redirect(url_for('login'))
 
     dados = request.json
     novo_status = dados.get('status')

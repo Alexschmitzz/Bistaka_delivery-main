@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Fechamento de Caixa</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        .card { background: #ecf0f1; padding: 15px 20px; margin: 10px 0; border-radius: 8px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center;}
+        .card.destaque { background: #27ae60; color: white; font-weight: bold; font-size: 1.4rem; border: none; }
+        .btn-voltar { display: block; text-align: center; margin-top: 25px; padding: 12px; background: #34495e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .btn-voltar:hover { background: #2c3e50; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Caixa do Dia</h1>
+        <p style="text-align: center; color: #7f8c8d; margin-top: 0; margin-bottom: 25px;">Apenas pedidos concluídos de hoje</p>
+        
+        <div class="card destaque">
+            <span>Total Faturado:</span>
+            <span>R$ {{ "%.2f"|format(bruto) }}</span>
+        </div>
+        
+        <div class="card">
+            <span>🍔 Pedidos Entregues:</span>
+            <span><strong>{{ qtd }}</strong></span>
+        </div>
+
+        <h3 style="margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #34495e;">Por Forma de Pagamento</h3>
+        
+        <div class="card">
+            <span>📱 Pix:</span>
+            <span style="color: #27ae60; font-weight: bold;">R$ {{ "%.2f"|format(pix) }}</span>
+        </div>
+        <div class="card">
+            <span>💳 Cartão:</span>
+            <span style="color: #2980b9; font-weight: bold;">R$ {{ "%.2f"|format(cartao) }}</span>
+        </div>
+        <div class="card">
+            <span>💵 Dinheiro:</span>
+            <span style="color: #d35400; font-weight: bold;">R$ {{ "%.2f"|format(dinheiro) }}</span>
+        </div>
+
+        <a href="/admin/dashboard" class="btn-voltar">⬅️ Voltar para a Cozinha</a>
+    </div>
+</body>
+</html>

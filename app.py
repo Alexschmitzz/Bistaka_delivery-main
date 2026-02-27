@@ -202,6 +202,59 @@ def add_item():
     save_cardapio(itens)
     return redirect(url_for('admin'))
 
+# ROTA: Editar Produto (GET para mostrar o form, POST para salvar)
+@app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
+def edit_item(id):
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    
+    itens = load_cardapio()
+    
+    # Encontra o item específico pelo ID
+    item_para_editar = next((item for item in itens if item['id'] == id), None)
+    
+    if not item_para_editar:
+        return "Item não encontrado!", 404
+
+    # Se o formulário foi enviado (Salvando a edição)
+    if request.method == 'POST':
+        # --- LÓGICA DE IMAGEM ---
+        imagem = request.files.get('img_file')
+        # Mantém a imagem atual como padrão, caso não envie uma nova
+        img_path = item_para_editar.get('img', "https://via.placeholder.com/150")
+
+        if imagem and imagem.filename != '':
+            filename = secure_filename(imagem.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            imagem.save(filepath)
+            img_path = f"/static/uploads/{filename}"
+        elif request.form.get('img_url'):
+            img_path = request.form.get('img_url')
+
+        # --- LÓGICA DE ADICIONAIS ---
+        add_nomes = request.form.getlist('add_nome[]')
+        add_precos = request.form.getlist('add_preco[]')
+        
+        lista_adicionais = []
+        for nome, preco in zip(add_nomes, add_precos):
+            if nome.strip() and preco.strip():
+                lista_adicionais.append({
+                    "nome": nome.strip(),
+                    "preco": float(preco.strip())
+                })
+
+        # Atualiza os dados do item
+        item_para_editar['categoria'] = request.form['categoria']
+        item_para_editar['nome'] = request.form['nome']
+        item_para_editar['desc'] = request.form['desc']
+        item_para_editar['preco'] = float(request.form['preco'])
+        item_para_editar['img'] = img_path
+        item_para_editar['adicionais'] = lista_adicionais
+
+        save_cardapio(itens)
+        return redirect(url_for('admin'))
+
+    # Se for GET (Apenas abrindo a página), renderiza o HTML preenchido
+    return render_template('edit.html', item=item_para_editar)
 
 # ROTA: Ativar/Desativar Produto
 @app.route('/admin/toggle/<int:id>')

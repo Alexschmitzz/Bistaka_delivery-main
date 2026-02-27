@@ -32,6 +32,33 @@
                 "nome": "cheddar",
                 "preco": 0.0
             }
+        ],
+        "ativo": true
+    },
+    {
+        "id": 20,
+        "categoria": "Smash",
+        "nome": "Smash Ligth",
+        "desc": "Pão Brioche ou Gergelim ou Roseta .\r\n1 carne 130G\r\n2 Fatias de queijo\r\nAlface e tomate\r\nketchup e Maionese .",
+        "preco": 23.0,
+        "img": "/static/uploads/Smash_light.jpg",
+        "adicionais": [
+            {
+                "nome": "Pão Roseta",
+                "preco": 0.0
+            },
+            {
+                "nome": "Pão Brioche",
+                "preco": 0.0
+            },
+            {
+                "nome": "Muçarela",
+                "preco": 0.0
+            },
+            {
+                "nome": "Cheddar",
+                "preco": 1.0
+            }
         ]
     },
     {
@@ -152,12 +179,91 @@
         "adicionais": []
     },
     {
-        "id": 2,
+        "id": 21,
+        "categoria": "Smash",
+        "nome": "Smash Pop",
+        "desc": "Pão Brioche ou Roseta.\r\n1 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese.",
+        "preco": 20.0,
+        "img": "/static/uploads/SmashPop.jpg",
+        "adicionais": [
+            {
+                "nome": "Pão Roseta",
+                "preco": 0.0
+            },
+            {
+                "nome": "Pão Brioche",
+                "preco": 0.0
+            },
+            {
+                "nome": "Musarela",
+                "preco": 0.0
+            },
+            {
+                "nome": "Cheddar",
+                "preco": 1.0
+            }
+        ]
+    },
+    {
+        "id": 22,
+        "categoria": "Smash",
+        "nome": "Smash Duplo",
+        "desc": "Pão Brioche ou Roseta .\r\n1 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese .",
+        "preco": 28.5,
+        "img": "/static/uploads/Smash_Duplo.jpg",
+        "adicionais": [
+            {
+                "nome": "Pão Roseta",
+                "preco": 0.0
+            },
+            {
+                "nome": "Pão Brioche",
+                "preco": 0.0
+            },
+            {
+                "nome": "Musarela",
+                "preco": 0.0
+            },
+            {
+                "nome": "Cheddar",
+                "preco": 1.0
+            }
+        ]
+    },
+    {
+        "id": 23,
+        "categoria": "Porções",
+        "nome": "Porção de Batata Frita",
+        "desc": "",
+        "preco": 25.0,
+        "img": "/static/uploads/Porcao_de_Batata_Frita.jpg",
+        "adicionais": []
+    },
+    {
+        "id": 24,
+        "categoria": "Porções",
+        "nome": "Porção Batata Bacon e Musarela",
+        "desc": "",
+        "preco": 39.0,
+        "img": "/static/uploads/porcao_bacon.jfif",
+        "adicionais": []
+    },
+    {
+        "id": 25,
+        "categoria": "Porções",
+        "nome": "Porção Batata Bacon Cheddar",
+        "desc": "",
+        "preco": 43.0,
+        "img": "/static/uploads/Batatacheddar.jfif",
+        "adicionais": []
+    },
+    {
+        "id": 26,
         "categoria": "Bebidas",
-        "nome": "Coca-Cola Lata",
-        "desc": "350ml gelada.",
-        "preco": 6.0,
-        "img": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500",
-        "ativo": true
+        "nome": "Refri Lata",
+        "desc": "Escolha de sabores nos Adicionais",
+        "preco": 7.0,
+        "img": "/static/uploads/refrilata.jfif",
+        "adicionais": []
     }
 ]

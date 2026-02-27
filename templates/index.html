@@ -17,11 +17,28 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background: var(--light); padding-bottom: 120px; color: var(--dark); }
         
-        /* Cabeçalho */
+       /* Cabeçalho */
         header { 
-            background: white; padding: 15px; text-align: center; 
+            background: white; padding: 15px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 90;
+            /* Novas regras para alinhar a logo e o texto lado a lado */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* Espaçamento perfeito entre a imagem e o texto */
         }
+
+        .logo-bistaka {
+            width: 65px; /* Tamanho proporcional para não quebrar a tela */
+            height: auto;
+            border-radius: 50%; /* Deixa a logo redondinha (se preferir quadrada, mude para 8px) */
+            object-fit: cover;
+        }
+
+        .header-text {
+            text-align: left; /* Mantém o texto alinhado certinho ao lado da imagem */
+        }
+
         h1 { margin: 0; font-size: 1.4rem; color: var(--dark); }
         p.loja-desc { margin: 5px 0 0; color: #717171; font-size: 0.85rem; }
         .status-badge { 
@@ -156,8 +173,12 @@
 <body>
 
 <header>
-    <h1>Bistaka Lanches <span id="status-loja" class="status-badge status-open">ABERTO</span></h1>
-    <p class="loja-desc">R. Pé do Cambirela, 175 - Praia do Pontal</p>
+    <img src="/static/uploads/logo.png" alt="Logo Bistaka Lanches" class="logo-bistaka">
+    
+    <div class="header-text">
+        <h1>Bistaka Lanches <span id="status-loja" class="status-badge status-open">ABERTO</span></h1>
+        <p class="loja-desc">R. Pé do Cambirela, 175 - Praia do Pontal</p>
+    </div>
 </header>
 
 <div id="aviso-fechado">

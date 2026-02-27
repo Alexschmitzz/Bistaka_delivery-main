@@ -21,6 +21,7 @@
         .btn-ativo { background: #2ecc71; color: white; }
         .btn-inativo { background: #95a5a6; color: white; }
         .btn-move { background: #f39c12; color: white; padding: 5px 8px; border-radius: 3px; text-decoration: none; font-size: 0.9rem; margin-right: 2px;}
+        .btn-edit { background: #3498db; padding: 5px 10px; font-size: 0.8rem; text-decoration: none; color: white; border-radius: 3px; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -113,7 +114,9 @@
                         <a href="/admin/toggle/{{ item.id }}" class="btn-status btn-inativo">❌ Faltando</a>
                     {% endif %}
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
+                    <a href="/admin/edit/{{ item.id }}" class="btn-edit">✏️ Editar</a>
+
                     <a href="/admin/delete/{{ item.id }}" class="btn-delete" onclick="return confirm('Tem certeza que quer apagar permanentemente?')">Excluir</a>
                 </td>
             </tr>

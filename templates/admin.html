@@ -114,8 +114,9 @@
                         <a href="/admin/toggle/{{ item.id }}" class="btn-status btn-inativo">❌ Faltando</a>
                     {% endif %}
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <a href="/admin/edit/{{ item.id }}" class="btn-edit">✏️ Editar</a>
+
                     <a href="/admin/delete/{{ item.id }}" class="btn-delete" onclick="return confirm('Tem certeza que quer apagar permanentemente?')">Excluir</a>
                 </td>
             </tr>

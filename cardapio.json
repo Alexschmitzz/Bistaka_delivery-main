@@ -36,6 +36,32 @@
         "ativo": true
     },
     {
+        "id": 21,
+        "categoria": "Smash",
+        "nome": "Smash Pop",
+        "desc": "Pão Brioche ou Roseta.\r\n1 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese.",
+        "preco": 20.0,
+        "img": "/static/uploads/SmashPop.jpg",
+        "adicionais": [
+            {
+                "nome": "Pão Roseta",
+                "preco": 0.0
+            },
+            {
+                "nome": "Pão Brioche",
+                "preco": 0.0
+            },
+            {
+                "nome": "Musarela",
+                "preco": 0.0
+            },
+            {
+                "nome": "Cheddar",
+                "preco": 1.0
+            }
+        ]
+    },
+    {
         "id": 20,
         "categoria": "Smash",
         "nome": "Smash Ligth",
@@ -53,6 +79,32 @@
             },
             {
                 "nome": "Muçarela",
+                "preco": 0.0
+            },
+            {
+                "nome": "Cheddar",
+                "preco": 1.0
+            }
+        ]
+    },
+    {
+        "id": 22,
+        "categoria": "Smash",
+        "nome": "Smash Duplo",
+        "desc": "Pão Brioche ou Roseta .\r\n1 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese .",
+        "preco": 29.9,
+        "img": "/static/uploads/Smash_Duplo.jpg",
+        "adicionais": [
+            {
+                "nome": "Pão Roseta",
+                "preco": 0.0
+            },
+            {
+                "nome": "Pão Brioche",
+                "preco": 0.0
+            },
+            {
+                "nome": "Musarela",
                 "preco": 0.0
             },
             {
@@ -177,58 +229,6 @@
         "preco": 33.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": []
-    },
-    {
-        "id": 21,
-        "categoria": "Smash",
-        "nome": "Smash Pop",
-        "desc": "Pão Brioche ou Roseta.\r\n1 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese.",
-        "preco": 20.0,
-        "img": "/static/uploads/SmashPop.jpg",
-        "adicionais": [
-            {
-                "nome": "Pão Roseta",
-                "preco": 0.0
-            },
-            {
-                "nome": "Pão Brioche",
-                "preco": 0.0
-            },
-            {
-                "nome": "Musarela",
-                "preco": 0.0
-            },
-            {
-                "nome": "Cheddar",
-                "preco": 1.0
-            }
-        ]
-    },
-    {
-        "id": 22,
-        "categoria": "Smash",
-        "nome": "Smash Duplo",
-        "desc": "Pão Brioche ou Roseta .\r\n1 carne 130g\r\n2 Fatias de queijo\r\nketchup e Maionese .",
-        "preco": 28.5,
-        "img": "/static/uploads/Smash_Duplo.jpg",
-        "adicionais": [
-            {
-                "nome": "Pão Roseta",
-                "preco": 0.0
-            },
-            {
-                "nome": "Pão Brioche",
-                "preco": 0.0
-            },
-            {
-                "nome": "Musarela",
-                "preco": 0.0
-            },
-            {
-                "nome": "Cheddar",
-                "preco": 1.0
-            }
-        ]
     },
     {
         "id": 23,

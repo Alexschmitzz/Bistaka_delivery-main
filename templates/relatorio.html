@@ -5,13 +5,35 @@
     <title>Fechamento de Caixa</title>
     <link rel="icon" type="image/png" href="static/uploads/logo.png">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
-        .card { background: #ecf0f1; padding: 15px 20px; margin: 10px 0; border-radius: 8px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center;}
-        .card.destaque { background: #27ae60; color: white; font-weight: bold; font-size: 1.4rem; border: none; }
-        .btn-voltar { display: block; text-align: center; margin-top: 25px; padding: 12px; background: #34495e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        .btn-voltar:hover { background: #2c3e50; }
+        .admin-navbar {
+            background: #2c3e50; color: white; padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
+        .admin-navbar .brand {
+            font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .admin-navbar .nav-links {
+            display: flex; gap: 10px; flex-wrap: wrap; }
+        .admin-navbar a {
+            color: white; text-decoration: none; padding: 8px 15px; 
+            border-radius: 5px; background: rgba(255,255,255,0.1); 
+            transition: background 0.2s; font-size: 0.95rem; font-family: sans-serif; }
+        .admin-navbar a:hover { background: rgba(255,255,255,0.25); }
+        @media print { 
+        .admin-navbar { display: none !important; } }
+        body {
+             font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
+        .container {
+             max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 {
+             text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        .card {
+             background: #ecf0f1; padding: 15px 20px; margin: 10px 0; border-radius: 8px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center;}
+        .card.destaque {
+             background: #27ae60; color: white; font-weight: bold; font-size: 1.4rem; border: none; }
+        .btn-voltar {
+             display: block; text-align: center; margin-top: 25px; padding: 12px; background: #34495e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .btn-voltar:hover {
+             background: #2c3e50; }
     </style>
 </head>
 <body>

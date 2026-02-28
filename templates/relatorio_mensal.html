@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Mensal</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        .card { background: #ecf0f1; padding: 15px 20px; margin: 10px 0; border-radius: 8px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center;}
+        .card.destaque { background: #8e44ad; color: white; font-weight: bold; font-size: 1.4rem; border: none; }
+        
+        /* A Barra de Navegação */
+        .admin-navbar { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
+        .admin-navbar .brand { font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .admin-navbar .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+        .admin-navbar a { color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; background: rgba(255,255,255,0.1); transition: background 0.2s; font-size: 0.95rem; }
+        .admin-navbar a:hover { background: rgba(255,255,255,0.25); }
+    </style>
+</head>
+<body>
+    <nav class="admin-navbar">
+        <div class="brand"><img src="/static/uploads/logo.png" style="height: 35px; width: 35px; border-radius: 50%; object-fit: cover;">Painel Bistaka</div>
+        <div class="nav-links">
+            <a href="/admin/dashboard">🍳 Cozinha</a>
+            <a href="/admin">🍔 Cardápio</a>
+            <a href="/admin/relatorio">📊 Dia</a>
+            <a href="/admin/relatorio_mensal" style="background: #e67e22;">📈 Mês</a>
+            <a href="/admin/clientes">👥 Clientes</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>📈 Faturamento Mensal</h1>
+        <p style="text-align: center; color: #7f8c8d; margin-top: 0; margin-bottom: 25px;">Referência: {{ mes }}</p>
+        
+        <div class="card destaque">
+            <span>Total do Mês:</span>
+            <span>R$ {{ "%.2f"|format(bruto) }}</span>
+        </div>
+        
+        <div class="card">
+            <span>🍔 Pedidos Finalizados:</span>
+            <span><strong>{{ qtd }}</strong></span>
+        </div>
+
+        <h3 style="margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #34495e;">Resumo por Pagamento</h3>
+        <div class="card"><span>📱 Pix:</span><span style="color: #27ae60; font-weight: bold;">R$ {{ "%.2f"|format(pix) }}</span></div>
+        <div class="card"><span>💳 Cartão:</span><span style="color: #2980b9; font-weight: bold;">R$ {{ "%.2f"|format(cartao) }}</span></div>
+        <div class="card"><span>💵 Dinheiro:</span><span style="color: #d35400; font-weight: bold;">R$ {{ "%.2f"|format(dinheiro) }}</span></div>
+    </div>
+</body>
+</html>

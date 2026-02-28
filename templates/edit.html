@@ -5,7 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Item</title>
     <link rel="icon" type="image/png" href="/static/uploads/logo.png">
+
+    
     <style>
+    
+        .admin-navbar {
+            background: #2c3e50; color: white; padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px;
+                }
+        .admin-navbar .brand {
+            font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;
+                }
+        .admin-navbar .nav-links {
+            display: flex; gap: 10px; flex-wrap: wrap;
+                }
+        .admin-navbar a {
+            color: white; text-decoration: none; padding: 8px 15px; 
+            border-radius: 5px; background: rgba(255,255,255,0.1); 
+            transition: background 0.2s; font-size: 0.95rem; font-family: sans-serif;
+                }
+        .admin-navbar a:hover { background: rgba(255,255,255,0.25); }
+    
+        @media print { .admin-navbar { display: none !important; } }
+
         body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
         .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h2 { border-bottom: 2px solid #3498db; padding-bottom: 10px; color: #3498db; }
@@ -16,6 +39,19 @@
     </style>
 </head>
 <body>
+
+<nav class="admin-navbar">
+    <div class="brand">
+        <img src="/static/uploads/logo.png" style="height: 35px; width: 35px; border-radius: 50%; object-fit: cover;">
+        Painel Bistaka
+    </div>
+    <div class="nav-links">
+        <a href="/admin/dashboard">🍳 Cozinha</a>
+        <a href="/admin">🍔 Cardápio</a>
+        <a href="/admin/relatorio">📊 Caixa</a>
+        <a href="/" target="_blank" style="background: transparent; border: 1px solid #bdc3c7;">🌐 Ver Site</a>
+    </div>
+</nav>
 
 <div class="container">
     <h2>✏️ Editar: {{ item.nome }}</h2>

@@ -381,6 +381,48 @@ def relatorio_caixa():
                            cartao=total_cartao, 
                            dinheiro=total_dinheiro)
 
+@app.route('/admin/relatorio_mensal')
+def relatorio_mensal():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    # Pega o mês e ano atual (Ex: '2026-02')
+    mes_atual = datetime.now().strftime('%Y-%m')
+    
+    # Filtra os pedidos finalizados apenas deste mês
+    cursor = conn.execute('''
+        SELECT total, metodo_pagamento FROM pedidos
+        WHERE strftime('%Y-%m', data_pedido) = ?
+        AND status = 'finalizado'
+    ''', (mes_atual,))
+    pedidos_mes = cursor.fetchall()
+    conn.close()
+
+    qtd_pedidos = len(pedidos_mes)
+    total_bruto = sum(p['total'] for p in pedidos_mes)
+    
+    total_pix = sum(p['total'] for p in pedidos_mes if 'Pix' in p['metodo_pagamento'] or 'pix' in p['metodo_pagamento'])
+    total_cartao = sum(p['total'] for p in pedidos_mes if 'Cartão' in p['metodo_pagamento'] or 'cartao' in p['metodo_pagamento'])
+    total_dinheiro = sum(p['total'] for p in pedidos_mes if 'Dinheiro' in p['metodo_pagamento'] or 'dinheiro' in p['metodo_pagamento'])
+
+    return render_template('relatorio_mensal.html', 
+                           mes=datetime.now().strftime('%m/%Y'),
+                           qtd=qtd_pedidos, bruto=total_bruto, 
+                           pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro)
+
+# ROTA 12: Lista de Clientes (CRM)
+@app.route('/admin/clientes')
+def lista_clientes():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    # Busca todos os clientes e já ordena pelos que mais gastaram na lanchonete!
+    cursor = conn.execute('SELECT * FROM clientes ORDER BY total_gasto DESC')
+    clientes = cursor.fetchall()
+    conn.close()
+
+    return render_template('clientes.html', clientes=clientes)
+
 if __name__ == '__main__':
     # Roda acessível na rede local
     app.run(host='0.0.0.0', port=5000, debug=True)

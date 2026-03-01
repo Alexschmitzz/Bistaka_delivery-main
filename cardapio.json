@@ -177,15 +177,6 @@
         "adicionais": []
     },
     {
-        "id": 13,
-        "categoria": "Lanches",
-        "nome": "X-Coração",
-        "desc": "Hambúrguer com 130g, presunto, mussarela, 100g de coração suculento, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha.",
-        "preco": 33.0,
-        "img": "/static/uploads/IMG_9498.webp",
-        "adicionais": []
-    },
-    {
         "id": 14,
         "categoria": "Hotdogs",
         "nome": " Hotdog Tradicional",

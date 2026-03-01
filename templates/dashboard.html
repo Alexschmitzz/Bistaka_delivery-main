@@ -95,30 +95,37 @@
         /* --- MÁGICA DA IMPRESSÃO TÉRMICA (80mm) --- */
         #cupom-fiscal { display: none; } /* Esconde na tela normal */
 
-        @media print {
-            /* Esconde TUDO da tela do PC */
-            body * { visibility: hidden; }
-            .painel-container, .btn-imprimir { display: none; }
+       @media print {
+    /* Esconde TUDO da tela do PC */
+    body * { visibility: hidden; }
+    .painel-container, .btn-imprimir { display: none; }
 
-            /* Mostra SÓ o cupom */
-            #cupom-fiscal, #cupom-fiscal * {
-                visibility: visible; display: block;
-            }
-            
-            #cupom-fiscal {
-                position: absolute; left: 0; top: 0; width: 80mm; /* Largura padrão térmica */
-                font-family: 'Courier New', monospace; /* Fonte tipo recibo */
-                font-size: 12px; line-height: 1.2; padding: 0; margin: 0;
-                color: black;
-            }
+    /* Mostra SÓ o cupom */
+    #cupom-fiscal, #cupom-fiscal * {
+        visibility: visible; display: block;
+    }
+    
+    #cupom-fiscal {
+        position: absolute; left: 0; top: 0; width: 80mm; /* Largura padrão térmica */
+        font-family: 'Courier New', monospace !important; /* Fonte tipo recibo */
+        font-size: 13px !important; /* Aumentei para 13px para dar mais clareza térmica */
+        line-height: 1.2; padding: 0; margin: 0;
+        
+        /* REGRAS OBRIGATÓRIAS PARA IMPRESSORA TÉRMICA FICAR BEM PRETA */
+        color: #000000 !important;
+        background-color: #FFFFFF !important;
+        font-weight: bold !important; /* Aumenta a área de queima do papel */
+        -webkit-font-smoothing: none !important; /* Remove o esfumaçado da fonte */
+        text-rendering: crispEdges !important; /* Deixa os pixels da letra duros */
+    }
 
-            /* Formatação do Recibo */
-            .recibo-header { text-align: center; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
-            .recibo-body { margin-bottom: 10px; border-bottom: 1px dashed black; padding-bottom: 5px; }
-            .recibo-item { display: flex; justify-content: space-between; }
-            .recibo-total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px; }
-            .recibo-footer { text-align: center; font-size: 10px; margin-top: 10px; }
-        }
+    /* Formatação do Recibo */
+    .recibo-header { text-align: center; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
+    .recibo-body { margin-bottom: 10px; border-bottom: 1px dashed black; padding-bottom: 5px; }
+    .recibo-item { display: flex; justify-content: space-between; }
+    .recibo-total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px; }
+    .recibo-footer { text-align: center; font-size: 10px; margin-top: 10px; }
+}
     </style>
 </head>
 <body>

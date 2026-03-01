@@ -7,7 +7,26 @@
     <link rel="icon" type="image/png" href="static/uploads/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* ESTILO DA TELA DO PC (Monitor) */
+        .admin-navbar {
+            background: #2c3e50; color: white; padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px;
+            }
+        .admin-navbar .brand {
+            font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;
+             }
+         .admin-navbar .nav-links {
+            display: flex; gap: 10px; flex-wrap: wrap;
+            }
+        .admin-navbar a {
+            color: white; text-decoration: none; padding: 8px 15px; 
+            border-radius: 5px; background: rgba(255,255,255,0.1); 
+             transition: background 0.2s; font-size: 0.95rem; font-family: sans-serif;
+            }
+         .admin-navbar a:hover { background: rgba(255,255,255,0.25); }
+    
+        @media print { .admin-navbar { display: none !important; } }
+
         body { font-family: 'Segoe UI', sans-serif; background: #ffffff; padding: 20px; margin: 0; }
         
         .painel-container {
@@ -103,6 +122,19 @@
     </style>
 </head>
 <body>
+<nav class="admin-navbar">
+    <div class="brand">
+        <img src="/static/uploads/logo.png" style="height: 35px; width: 35px; border-radius: 50%; object-fit: cover;">
+        Painel Bistaka
+    </div>
+        <div class="nav-links">
+             <a href="/admin/dashboard">🍳 Cozinha</a>
+            <a href="/admin">🍔 Cardápio</a>
+            <a href="/admin/relatorio">📊 Dia</a>
+            <a href="/admin/relatorio_mensal">📈 Mês</a>
+            <a href="/admin/clientes" style="background: #27ae60;">👥 Clientes</a>
+            <a href="/" target="_blank" style="background: transparent; border: 1px solid #bdc3c7;">🌐 Ver Site</a>
+        </div>
 
 <div class="painel-container">
     <h1>
@@ -125,7 +157,7 @@
     let ultimoId = 0;
 
     // Toca um som quando chega pedido novo (opcional)
-    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
 
     async function buscarPedidos() {
         try {

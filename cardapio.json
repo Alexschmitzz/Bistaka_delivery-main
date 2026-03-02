@@ -237,7 +237,8 @@
         "desc": "",
         "preco": 39.0,
         "img": "/static/uploads/porcao_bacon.jfif",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": false
     },
     {
         "id": 25,
@@ -246,7 +247,8 @@
         "desc": "",
         "preco": 43.0,
         "img": "/static/uploads/Batatacheddar.jfif",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": false
     },
     {
         "id": 26,

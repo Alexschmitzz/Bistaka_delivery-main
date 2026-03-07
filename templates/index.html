@@ -594,11 +594,11 @@ async function enviarWhatsapp() {
             
             if(item.adds.length) {
                 textoZap += `+ ${item.adds.join(', ')}\n`;
-                itemDb += ` (+ ${item.adds.join(', ')})`; // Add no banco
+                itemDb += ` (+ ${item.adds.join(', ')})\n`; // Add no banco
             }
             if(item.obs) {
                 textoZap += `_Obs: ${item.obs}_\n`;
-                itemDb += ` [Obs: ${item.obs}]`; // Add no banco
+                itemDb += ` [Obs: ${item.obs}]\n`; // Add no banco
             }
             
             textoZap += `R$ ${item.total.toFixed(2)}\n\n`;
@@ -630,9 +630,7 @@ async function enviarWhatsapp() {
             } else {
                 // Se digitou manual, cria uma busca inteligente no Maps
                 const buscaMaps = `${endereco}, ${bairroSelecionado}, Palhoça - SC`;
-                linkMapa = `https://maps.google.com/?q=${encodeURIComponent(buscaMaps)}`;
             }
-            textoZap += `🗺️ *Mapa:* ${linkMapa}\n`;
         }
         // --- SALVAR NO BANCO DE DADOS (NOVO!) ---
         const btn = document.querySelector('.btn-whatsapp');
@@ -647,7 +645,7 @@ async function enviarWhatsapp() {
                 body: JSON.stringify({
                     telefone: telefone,
                     nome: nomeCliente,
-                    endereco: endereco + (linkMapa ? ` (Mapa: ${linkMapa})` : ''),
+                    endereco: endereco,
                     bairro: bairroDb,
                     total: totalFinal,
                     pagamento: pag,

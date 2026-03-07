@@ -238,7 +238,7 @@
         "preco": 39.0,
         "img": "/static/uploads/porcao_bacon.jfif",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 25,
@@ -248,7 +248,7 @@
         "preco": 43.0,
         "img": "/static/uploads/Batatacheddar.jfif",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 26,
@@ -257,6 +257,19 @@
         "desc": "Escolha de sabores nos Adicionais",
         "preco": 7.0,
         "img": "/static/uploads/refrilata.jfif",
-        "adicionais": []
+        "adicionais": [
+            {
+                "nome": "Coca",
+                "preco": 0.0
+            },
+            {
+                "nome": "Coca Zero",
+                "preco": 0.0
+            },
+            {
+                "nome": "Guaraná",
+                "preco": 0.0
+            }
+        ]
     }
 ]

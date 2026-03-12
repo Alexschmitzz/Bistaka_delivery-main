@@ -397,11 +397,16 @@ def mudar_status(pedido_id):
 @app.route('/admin/relatorio')
 def relatorio_caixa():
     if not session.get('logged_in'): return redirect(url_for('login'))
+
     conn = get_db_connection()
+
     cursor = conn.execute('''
-        SELECT total, metodo_pagamento FROM pedidos
-        WHERE date(data_pedido) = date('now', 'localtime')
-        AND status = 'finalizado'
+        SELECT p.*, c.nome
+        FROM pedidos p
+        LEFT JOIN clientes c ON p.cliente_telefone = c.telefone
+        WHERE date(p.data_pedido) = date('now', 'localtime')
+        AND p.status = 'finalizado'
+        ORDER BY p.data_pedido DESC
     ''')
     pedidos_hoje = cursor.fetchall()
     conn.close()
@@ -412,17 +417,25 @@ def relatorio_caixa():
     total_cartao = sum(p['total'] for p in pedidos_hoje if 'Cartão' in p['metodo_pagamento'] or 'cartao' in p['metodo_pagamento'])
     total_dinheiro = sum(p['total'] for p in pedidos_hoje if 'Dinheiro' in p['metodo_pagamento'] or 'dinheiro' in p['metodo_pagamento'])
 
-    return render_template('relatorio.html', qtd=qtd_pedidos, bruto=total_bruto, pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro)
+    return render_template('relatorio.html', 
+                           qtd=qtd_pedidos, bruto=total_bruto, 
+                           pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro,
+                           pedidos=pedidos_hoje)
 
 @app.route('/admin/relatorio_mensal')
 def relatorio_mensal():
     if not session.get('logged_in'): return redirect(url_for('login'))
+    
     conn = get_db_connection()
     mes_atual = datetime.now().strftime('%Y-%m')
+    
     cursor = conn.execute('''
-        SELECT total, metodo_pagamento FROM pedidos
-        WHERE strftime('%Y-%m', data_pedido) = ?
-        AND status = 'finalizado'
+        SELECT p.*, c.nome
+        FROM pedidos p
+        LEFT JOIN clientes c ON p.cliente_telefone = c.telefone
+        WHERE strftime('%Y-%m', p.data_pedido) = ?
+        AND p.status = 'finalizado'
+        ORDER BY p.data_pedido DESC
     ''', (mes_atual,))
     pedidos_mes = cursor.fetchall()
     conn.close()
@@ -433,7 +446,11 @@ def relatorio_mensal():
     total_cartao = sum(p['total'] for p in pedidos_mes if 'Cartão' in p['metodo_pagamento'] or 'cartao' in p['metodo_pagamento'])
     total_dinheiro = sum(p['total'] for p in pedidos_mes if 'Dinheiro' in p['metodo_pagamento'] or 'dinheiro' in p['metodo_pagamento'])
 
-    return render_template('relatorio_mensal.html', mes=datetime.now().strftime('%m/%Y'), qtd=qtd_pedidos, bruto=total_bruto, pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro)
+    return render_template('relatorio_mensal.html', 
+                           mes=datetime.now().strftime('%m/%Y'),
+                           qtd=qtd_pedidos, bruto=total_bruto, 
+                           pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro,
+                           pedidos=pedidos_mes)
 
 @app.route('/admin/clientes')
 def lista_clientes():

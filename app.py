@@ -11,11 +11,14 @@ app.secret_key = 'segredo_do_lucao_lanches' # Necessário para login e sessões
 
 DB_FILE = 'BISTAKA.db'
 CARDAPIO_FILE = 'cardapio.json'
+CONFIG_FILE = 'config_loja.json'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- CONFIGURAÇÃO DO BANCO DE DADOS ---
+# ==========================================
+# 1. CONFIGURAÇÃO DO BANCO DE DADOS
+# ==========================================
 def init_db():
     with sqlite3.connect(DB_FILE) as conn:
         cursor = conn.cursor()
@@ -49,15 +52,16 @@ def init_db():
             pass 
         conn.commit()
 
-# Inicializa o banco ao iniciar o app
 init_db()
 
-# --- FUNÇÕES AUXILIARES ---
 def get_db_connection():
     conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row # Permite acessar colunas pelo nome
+    conn.row_factory = sqlite3.Row
     return conn
 
+# ==========================================
+# 2. FUNÇÕES DE ARQUIVOS (CARDÁPIO E CONFIG)
+# ==========================================
 def load_cardapio():
     if not os.path.exists(CARDAPIO_FILE): return []
     with open(CARDAPIO_FILE, 'r', encoding='utf-8') as f: return json.load(f)
@@ -66,26 +70,7 @@ def save_cardapio(data):
     with open(CARDAPIO_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-# --- ROTAS PÚBLICAS (CLIENTE) ---
-
-# ROTA 1: Página Inicial (Cardápio)
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-# ROTA 2: API que o site usa para carregar os lanches
-@app.route('/api/cardapio')
-def api_cardapio():
-    itens = load_cardapio()
-    itens_ativos = [item for item in itens if item.get('ativo', True)]
-    return jsonify(itens_ativos)
-
-
-# --- ROTAS ADMINISTRATIVAS ---
-CONFIG_FILE = 'config_loja.json'
-
 def load_config():
-    # Se o arquivo não existir, cria um com o padrão: Automático, 19h às 23h59, folga Segunda(0)
     if not os.path.exists(CONFIG_FILE): 
         return {
             "status_manual": "automatico", 
@@ -100,18 +85,15 @@ def save_config(data):
     with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-# O "Cérebro" que decide se a loja tá aberta ou não
 def is_loja_aberta():
     config = load_config()
     
-    # 1. Se você forçou no painel, ele ignora o relógio
     if config['status_manual'] == 'aberto': return True, "Loja aberta manualmente!"
     if config['status_manual'] == 'fechado': return False, "Estamos fechados por motivo de força maior."
     
-    # 2. Se estiver automático, ele olha pro relógio e pro calendário
     agora = datetime.now()
-    dia_semana = agora.weekday() # 0=Segunda, 1=Terça...
-    hora_atual = agora.strftime('%H:%M') # Fica no formato "19:30"
+    dia_semana = agora.weekday()
+    hora_atual = agora.strftime('%H:%M')
     
     if dia_semana in config.get('dias_fechados', []):
         return False, "Hoje é nosso dia de descanso!"
@@ -121,52 +103,81 @@ def is_loja_aberta():
         
     return True, "Loja Aberta"
 
-# --- ROTA QUE AVISA O SITE SE TÁ ABERTO ---
+# ==========================================
+# 3. ROTAS DO CLIENTE (FRONT-END)
+# ==========================================
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/api/cardapio')
+def api_cardapio():
+    itens = load_cardapio()
+    itens_ativos = [item for item in itens if item.get('ativo', True)]
+    return jsonify(itens_ativos)
+
 @app.route('/api/status_loja')
 def api_status_loja():
     aberto, msg = is_loja_aberta()
     return jsonify({"aberto": aberto, "mensagem": msg})
 
-# --- A TRAVA NO INÍCIO DO salvar_pedido ---
 @app.route('/api/salvar_pedido', methods=['POST'])
 def salvar_pedido():
     dados = request.json
     
+    # Trava de Segurança
     aberto, msg = is_loja_aberta()
     if not aberto:
         return jsonify({"status": "erro", "msg": msg}), 403
         
-    # ... (o resto do código do salvar_pedido continua igual daqui pra baixo!)
+    telefone = dados.get('telefone')
+    nome = dados.get('nome', 'Cliente Site')
+    endereco = dados.get('endereco')
+    bairro = dados.get('bairro')
+    total = float(dados.get('total'))
+    pagamento = dados.get('pagamento')
+    itens_texto = dados.get('resumo_itens')
+    agora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-# --- NOVA ROTA: TELA DE CONFIGURAÇÕES ---
-@app.route('/admin/configuracoes', methods=['GET', 'POST'])
-def configuracoes():
-    # Trava corrigida: agora ela só exige estar logado!
-    if not session.get('logged_in'): 
-        return redirect(url_for('login'))
-    
-    config = load_config()
-    
-    # Se o formulário foi enviado (você clicou em Salvar)
-    if request.method == 'POST':
-        config['status_manual'] = request.form['status_manual']
-        config['hora_abertura'] = request.form['hora_abertura']
-        config['hora_fechamento'] = request.form['hora_fechamento']
-        
-        # Pega as caixinhas dos dias de folga que você marcou
-        dias = request.form.getlist('dias_fechados')
-        config['dias_fechados'] = [int(d) for d in dias]
-        
-        save_config(config)
-        return redirect(url_for('configuracoes'))
-        
-    return render_template('configuracoes.html', config=config)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-# ROTA 4: Login
+        # Atualiza ou Cria Cliente
+        cursor.execute('SELECT * FROM clientes WHERE telefone = ?', (telefone,))
+        cliente_existente = cursor.fetchone()
+
+        if cliente_existente:
+            cursor.execute('''
+                UPDATE clientes SET 
+                    endereco = ?, bairro = ?, ultimo_pedido = ?, total_gasto = total_gasto + ?
+                WHERE telefone = ?
+            ''', (endereco, bairro, agora, total, telefone))
+        else:
+            cursor.execute('''
+                INSERT INTO clientes (telefone, nome, endereco, bairro, primeiro_pedido, ultimo_pedido, total_gasto)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (telefone, nome, endereco, bairro, agora, agora, total))
+
+        # Registra o Pedido
+        cursor.execute('''
+            INSERT INTO pedidos (cliente_telefone, itens, total, data_pedido, metodo_pagamento)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (telefone, itens_texto, total, agora, pagamento))
+
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "sucesso", "msg": "Pedido salvo!"})
+    except Exception as e:
+        print(f"Erro ao salvar pedido: {e}")
+        return jsonify({"status": "erro", "msg": str(e)}), 500
+
+# ==========================================
+# 4. ROTAS DO ADMINISTRADOR E LOGIN
+# ==========================================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Mude a senha aqui se quiser
         if request.form['username'] == 'admin' and request.form['password'] == '3357':
             session['logged_in'] = True
             return redirect(url_for('admin'))
@@ -177,18 +188,38 @@ def login():
         <h2>🔐 Área Restrita</h2>
         <input type="text" name="username" placeholder="Usuário" required style="padding:10px;"><br><br>
         <input type="password" name="password" placeholder="Senha" required style="padding:10px;"><br><br>
-        <button type="submit" style="padding:10px 20px; background:red; color:white; border:none; cursor:pointer;">Entrar</button>
+        <button type="submit" style="padding:10px 20px; background:#2c3e50; color:white; border:none; border-radius:5px; cursor:pointer;">Entrar</button>
     </form>
     '''
 
-# ROTA 5: Painel de Gerenciamento de Produtos
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
+@app.route('/admin/configuracoes', methods=['GET', 'POST'])
+def configuracoes():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    
+    config = load_config()
+    
+    if request.method == 'POST':
+        config['status_manual'] = request.form['status_manual']
+        config['hora_abertura'] = request.form['hora_abertura']
+        config['hora_fechamento'] = request.form['hora_fechamento']
+        dias = request.form.getlist('dias_fechados')
+        config['dias_fechados'] = [int(d) for d in dias]
+        save_config(config)
+        return redirect(url_for('configuracoes'))
+        
+    return render_template('configuracoes.html', config=config)
+
 @app.route('/admin')
 def admin():
     if not session.get('logged_in'): return redirect(url_for('login'))
     itens = load_cardapio()
     return render_template('admin.html', itens=itens)
 
-# ROTA 6: Adicionar Novo Produto
 @app.route('/admin/add', methods=['POST'])
 def add_item():
     if not session.get('logged_in'): return redirect(url_for('login'))
@@ -196,12 +227,10 @@ def add_item():
     itens = load_cardapio()
     novo_id = 1 if not itens else max(i['id'] for i in itens) + 1
     
-    # --- LÓGICA DE IMAGEM ---
     imagem = request.files.get('img_file')
     img_path = "https://via.placeholder.com/150" 
 
     if imagem and imagem.filename != '':
-        from werkzeug.utils import secure_filename
         filename = secure_filename(imagem.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         imagem.save(filepath)
@@ -209,18 +238,9 @@ def add_item():
     elif request.form.get('img_url'):
         img_path = request.form.get('img_url')
 
-    # --- LÓGICA DE ADICIONAIS (NOVO) ---
     add_nomes = request.form.getlist('add_nome[]')
     add_precos = request.form.getlist('add_preco[]')
-    
-    lista_adicionais = []
-    # Junta os nomes e preços digitados e salva numa lista
-    for nome, preco in zip(add_nomes, add_precos):
-        if nome.strip() and preco.strip():
-            lista_adicionais.append({
-                "nome": nome.strip(),
-                "preco": float(preco.strip())
-            })
+    lista_adicionais = [{"nome": n.strip(), "preco": float(p.strip())} for n, p in zip(add_nomes, add_precos) if n.strip() and p.strip()]
 
     novo_item = {
         "id": novo_id,
@@ -229,31 +249,23 @@ def add_item():
         "desc": request.form['desc'],
         "preco": float(request.form['preco']),
         "img": img_path,
-        "adicionais": lista_adicionais # Salva os adicionais no lanche
+        "adicionais": lista_adicionais
     }
     
     itens.append(novo_item)
     save_cardapio(itens)
     return redirect(url_for('admin'))
 
-# ROTA: Editar Produto (GET para mostrar o form, POST para salvar)
 @app.route('/admin/edit/<int:id>', methods=['GET', 'POST'])
 def edit_item(id):
     if not session.get('logged_in'): return redirect(url_for('login'))
-    
     itens = load_cardapio()
-    
-    # Encontra o item específico pelo ID
     item_para_editar = next((item for item in itens if item['id'] == id), None)
     
-    if not item_para_editar:
-        return "Item não encontrado!", 404
+    if not item_para_editar: return "Item não encontrado!", 404
 
-    # Se o formulário foi enviado (Salvando a edição)
     if request.method == 'POST':
-        # --- LÓGICA DE IMAGEM ---
         imagem = request.files.get('img_file')
-        # Mantém a imagem atual como padrão, caso não envie uma nova
         img_path = item_para_editar.get('img', "https://via.placeholder.com/150")
 
         if imagem and imagem.filename != '':
@@ -264,19 +276,10 @@ def edit_item(id):
         elif request.form.get('img_url'):
             img_path = request.form.get('img_url')
 
-        # --- LÓGICA DE ADICIONAIS ---
         add_nomes = request.form.getlist('add_nome[]')
         add_precos = request.form.getlist('add_preco[]')
-        
-        lista_adicionais = []
-        for nome, preco in zip(add_nomes, add_precos):
-            if nome.strip() and preco.strip():
-                lista_adicionais.append({
-                    "nome": nome.strip(),
-                    "preco": float(preco.strip())
-                })
+        lista_adicionais = [{"nome": n.strip(), "preco": float(p.strip())} for n, p in zip(add_nomes, add_precos) if n.strip() and p.strip()]
 
-        # Atualiza os dados do item
         item_para_editar['categoria'] = request.form['categoria']
         item_para_editar['nome'] = request.form['nome']
         item_para_editar['desc'] = request.form['desc']
@@ -287,65 +290,58 @@ def edit_item(id):
         save_cardapio(itens)
         return redirect(url_for('admin'))
 
-    # Se for GET (Apenas abrindo a página), renderiza o HTML preenchido
     return render_template('edit.html', item=item_para_editar)
 
-# ROTA: Ativar/Desativar Produto
 @app.route('/admin/toggle/<int:id>')
 def toggle_item(id):
     if not session.get('logged_in'): return redirect(url_for('login'))
     itens = load_cardapio()
     for item in itens:
         if item['id'] == id:
-            # Inverte o status atual (Se é True vira False, se é False vira True)
             item['ativo'] = not item.get('ativo', True)
             break
     save_cardapio(itens)
     return redirect(url_for('admin'))
 
-# ROTA: Mover Produto (Para cima ou Para baixo)
 @app.route('/admin/move/<int:id>/<direcao>')
 def move_item(id, direcao):
     if not session.get('logged_in'): return redirect(url_for('login'))
     itens = load_cardapio()
-    
     for i, item in enumerate(itens):
         if item['id'] == id:
             if direcao == 'up' and i > 0:
-                # Troca de lugar com o item de cima
                 itens[i], itens[i-1] = itens[i-1], itens[i]
             elif direcao == 'down' and i < len(itens) - 1:
-                # Troca de lugar com o item de baixo
                 itens[i], itens[i+1] = itens[i+1], itens[i]
             break
-            
     save_cardapio(itens)
     return redirect(url_for('admin'))
 
-# ROTA 7: Deletar Produto
 @app.route('/admin/delete/<int:id>')
 def delete_item(id):
     if not session.get('logged_in'): return redirect(url_for('login'))
-    
     itens = load_cardapio()
     itens = [i for i in itens if i['id'] != id]
     save_cardapio(itens)
     return redirect(url_for('admin'))
 
+# ==========================================
+# 5. ROTAS DA COZINHA E RELATÓRIOS
+# ==========================================
+@app.route('/admin/dashboard')
+def dashboard():
+    if not session.get('logged_in'): return redirect(url_for('login'))
+    return render_template('dashboard.html')
 
-# --- ROTAS DA COZINHA/DASHBOARD ---
-
-# ROTA 8: API para o Painel da Cozinha (Atualiza sozinho)
 @app.route('/api/pedidos_hoje')
 def api_pedidos_hoje():
     conn = get_db_connection()
-    # Pega os últimos 20 pedidos de hoje
     pedidos = conn.execute('''
        SELECT p.*, c.endereco, c.bairro, c.nome
         FROM pedidos p
         LEFT JOIN clientes c ON p.cliente_telefone = c.telefone
         WHERE date(p.data_pedido) = date('now', 'localtime')
-        ORDER BY p.id DESC LIMIT 20
+        ORDER BY p.id DESC LIMIT 30
     ''').fetchall()
     conn.close()
     
@@ -361,60 +357,47 @@ def api_pedidos_hoje():
             "total": p["total"],
             "hora": p["data_pedido"][11:16],
             "pagamento": p["metodo_pagamento"],
-            "status": p["status"],
-
+            "status": p["status"]
         })
     return jsonify(lista_pedidos)
 
-# ROTA: Antena de Eventos (SSE) para a Cozinha
 @app.route('/api/stream_pedidos')
 def stream_pedidos():
     def event_stream():
         ultimo_id_conhecido = 0
         while True:
-            # Dá uma olhadinha rápida só para ver qual é o ID do último pedido
             conn = get_db_connection()
             cursor = conn.execute('SELECT MAX(id) FROM pedidos')
             max_id = cursor.fetchone()[0] or 0
             conn.close()
 
-            # Se o ID for maior que o que a gente conhecia, tem pedido novo!
             if max_id > ultimo_id_conhecido:
                 ultimo_id_conhecido = max_id
-                # Envia um "sinal de fumaça" para o JavaScript da cozinha
                 yield f"data: novo_pedido\n\n"
             
-            # O servidor descansa 2 segundos antes de olhar o banco de novo
             time.sleep(2)
 
-    return Response(event_stream(), mimetype="text/event-stream")
-
-# ROTA 9: Tela do Dashboard (Impressão)
-@app.route('/admin/dashboard')
-def dashboard():
-    if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('dashboard.html')
+    return Response(event_stream(), mimetype="text/event-stream", headers={
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no'
+    })
 
 @app.route('/api/mudar_status/<int:pedido_id>', methods=['POST'])
 def mudar_status(pedido_id):
     if not session.get('logged_in'): return redirect(url_for('login'))
-
     dados = request.json
     novo_status = dados.get('status')
-    
     with sqlite3.connect(DB_FILE) as conn:
         cursor = conn.cursor()
         cursor.execute("UPDATE pedidos SET status = ? WHERE id = ?", (novo_status, pedido_id))
         conn.commit()
-        
     return jsonify({'status': 'sucesso'})
 
 @app.route('/admin/relatorio')
 def relatorio_caixa():
     if not session.get('logged_in'): return redirect(url_for('login'))
-
     conn = get_db_connection()
-    # Busca apenas os pedidos de HOJE que já foram FINALIZADOS (entregues)
     cursor = conn.execute('''
         SELECT total, metodo_pagamento FROM pedidos
         WHERE date(data_pedido) = date('now', 'localtime')
@@ -425,28 +408,17 @@ def relatorio_caixa():
 
     qtd_pedidos = len(pedidos_hoje)
     total_bruto = sum(p['total'] for p in pedidos_hoje)
-    
-    # Separa os valores procurando o nome da forma de pagamento
     total_pix = sum(p['total'] for p in pedidos_hoje if 'Pix' in p['metodo_pagamento'] or 'pix' in p['metodo_pagamento'])
     total_cartao = sum(p['total'] for p in pedidos_hoje if 'Cartão' in p['metodo_pagamento'] or 'cartao' in p['metodo_pagamento'])
     total_dinheiro = sum(p['total'] for p in pedidos_hoje if 'Dinheiro' in p['metodo_pagamento'] or 'dinheiro' in p['metodo_pagamento'])
 
-    return render_template('relatorio.html', 
-                           qtd=qtd_pedidos, 
-                           bruto=total_bruto, 
-                           pix=total_pix, 
-                           cartao=total_cartao, 
-                           dinheiro=total_dinheiro)
+    return render_template('relatorio.html', qtd=qtd_pedidos, bruto=total_bruto, pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro)
 
 @app.route('/admin/relatorio_mensal')
 def relatorio_mensal():
     if not session.get('logged_in'): return redirect(url_for('login'))
-
     conn = get_db_connection()
-    # Pega o mês e ano atual (Ex: '2026-02')
     mes_atual = datetime.now().strftime('%Y-%m')
-    
-    # Filtra os pedidos finalizados apenas deste mês
     cursor = conn.execute('''
         SELECT total, metodo_pagamento FROM pedidos
         WHERE strftime('%Y-%m', data_pedido) = ?
@@ -457,29 +429,20 @@ def relatorio_mensal():
 
     qtd_pedidos = len(pedidos_mes)
     total_bruto = sum(p['total'] for p in pedidos_mes)
-    
     total_pix = sum(p['total'] for p in pedidos_mes if 'Pix' in p['metodo_pagamento'] or 'pix' in p['metodo_pagamento'])
     total_cartao = sum(p['total'] for p in pedidos_mes if 'Cartão' in p['metodo_pagamento'] or 'cartao' in p['metodo_pagamento'])
     total_dinheiro = sum(p['total'] for p in pedidos_mes if 'Dinheiro' in p['metodo_pagamento'] or 'dinheiro' in p['metodo_pagamento'])
 
-    return render_template('relatorio_mensal.html', 
-                           mes=datetime.now().strftime('%m/%Y'),
-                           qtd=qtd_pedidos, bruto=total_bruto, 
-                           pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro)
+    return render_template('relatorio_mensal.html', mes=datetime.now().strftime('%m/%Y'), qtd=qtd_pedidos, bruto=total_bruto, pix=total_pix, cartao=total_cartao, dinheiro=total_dinheiro)
 
-# ROTA 12: Lista de Clientes (CRM)
 @app.route('/admin/clientes')
 def lista_clientes():
     if not session.get('logged_in'): return redirect(url_for('login'))
-
     conn = get_db_connection()
-    # Busca todos os clientes e já ordena pelos que mais gastaram na lanchonete!
     cursor = conn.execute('SELECT * FROM clientes ORDER BY total_gasto DESC')
     clientes = cursor.fetchall()
     conn.close()
-
     return render_template('clientes.html', clientes=clientes)
 
 if __name__ == '__main__':
-    # Roda acessível na rede local
     app.run(host='0.0.0.0', port=5000, debug=False)

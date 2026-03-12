@@ -135,12 +135,12 @@
         Painel Bistaka
     </div>
         <div class="nav-links">
-             <a href="/admin/dashboard">🍳 Cozinha</a>
+             <a href="/admin/dashboard" style="background: #e67e22;">🍳 Cozinha</a>
             <a href="/admin">🍔 Cardápio</a>
             <a href="/admin/relatorio">📊 Dia</a>
             <a href="/admin/relatorio_mensal">📈 Mês</a>
-            <a href="/admin/clientes" style="background: #27ae60;">👥 Clientes</a>
-            <a href="/admin/configuracoes" style="background: #e67e22;">⚙️ Config</a>
+            <a href="/admin/clientes">👥 Clientes</a>
+            <a href="/admin/configuracoes">⚙️ Config</a>
             <a href="/" target="_blank" style="background: transparent; border: 1px solid #bdc3c7;">🌐 Ver Site</a>
         </div>
 </nav>
@@ -175,9 +175,8 @@
             const lista = document.getElementById('lista');
             lista.innerHTML = ''; // Limpa e refaz (poderia ser otimizado, mas pra local tá ótimo)
 
-            // Verifica se tem pedido novo para tocar som
             if (pedidos.length > 0 && pedidos[0].id > ultimoId) {
-                if (ultimoId !== 0) audio.play(); // Toca só se não for o primeiro load
+                if (ultimoId !== 0) audio.play();
                 ultimoId = pedidos[0].id;
             }
 
@@ -238,7 +237,6 @@
     }
 
     function imprimirComanda(p) {
-        // 1. Preenche o HTML do Cupom Oculto
         const cupom = document.getElementById('cupom-fiscal');
         
       let itensHtml = p.itens ? p.itens.trim().split('\n').map(linha => {
@@ -246,7 +244,6 @@
             return '';
         }).join('') : '';
 
-        // Formata o endereço para a impressora
         const enderecoPrint = (p.bairro === 'Retirada' || !p.endereco)
             ? `<div style="text-align:center; font-weight:bold; margin: 5px 0; border: 1px solid black; padding: 2px;">RETIRADA NO BALCÃO</div>`
             : `<div><strong>Endereço:</strong> ${p.endereco}<br><strong>Bairro:</strong> ${p.bairro}</div>`;
@@ -295,27 +292,21 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: novoStatus })
             });
-            buscarPedidos(); // Recarrega a tela automaticamente!
+            buscarPedidos(); 
         } catch (error) {
             console.error("Erro ao mudar status:", error);
             alert("Erro ao atualizar o pedido.");
         }
     }
-   // ==========================================
-    // RÁDIO RECEPTOR DE NOVOS PEDIDOS (SSE)
-    // ==========================================
+  
     const fonteEventos = new EventSource('/api/stream_pedidos');
     
-    // Fica escutando a antena do servidor...
     fonteEventos.onmessage = function(event) {
         console.log("Sinal recebido do servidor: TEM PEDIDO NOVO!");
-        // Só agora ele vai lá e busca a lista atualizada
         buscarPedidos(); 
     };
 
-    // Mantém a busca inicial quando a tela carrega pela primeira vez
     buscarPedidos();
-    // Busca na hora que abre
 </script>
 
 </body>

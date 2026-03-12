@@ -3,39 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Meus Clientes</title>
+    <title>Bistaka - Base de Clientes</title>
     <link rel="icon" type="image/png" href="static/uploads/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-       .admin-navbar {
-            background: #2c3e50; color: white; padding: 15px 20px; 
+        :root {
+            --primary: #2c3e50;
+            --accent: #27ae60;
+            --gold: #f1c40f;
+            --light: #f4f7f6;
+        }
+
+        body { font-family: 'Roboto', sans-serif; background: var(--light); margin: 0; padding: 0; color: #333; }
+
+        /* Navbar */
+        .admin-navbar {
+            background: var(--primary); color: white; padding: 15px 20px; 
             display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
-        .admin-navbar .brand {
-            font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .admin-navbar .nav-links {
-            display: flex; gap: 10px; flex-wrap: wrap; }
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px;
+        }
+        .admin-navbar .brand { font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .admin-navbar .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
         .admin-navbar a {
             color: white; text-decoration: none; padding: 8px 15px; 
             border-radius: 5px; background: rgba(255,255,255,0.1); 
-            transition: background 0.2s; font-size: 0.95rem; font-family: sans-serif; }
+            transition: background 0.2s; font-size: 0.9rem;
+        }
         .admin-navbar a:hover { background: rgba(255,255,255,0.25); }
-        @media print { 
-        .admin-navbar { display: none !important; } }
-        body {
-             font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-        .container {
-             max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 {
-             text-align: center; color: #2c3e50; margin-bottom: 5px; }
-        .card {
-             background: #ecf0f1; padding: 15px 20px; margin: 10px 0; border-radius: 8px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center;}
-        .card.destaque {
-             background: #27ae60; color: white; font-weight: bold; font-size: 1.4rem; border: none; }
-        .btn-voltar {
-             display: block; text-align: center; margin-top: 25px; padding: 12px; background: #34495e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        .btn-voltar:hover {
-             background: #2c3e50; }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        
+        .header-section { text-align: center; margin-bottom: 30px; }
+        .header-section h1 { margin: 0; color: var(--primary); font-size: 2rem; }
+        .header-section p { color: #666; margin-top: 5px; }
+
+        /* Estilo dos Cards de Clientes */
+        .clientes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        .cliente-card {
+            background: white; border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 6px solid #ddd;
+            position: relative; transition: transform 0.2s;
+        }
+        .cliente-card:hover { transform: translateY(-5px); }
+
+        /* Destaque para Clientes VIP (Gasto > 200) */
+        .cliente-card.vip { border-left-color: var(--gold); background: #fffdf2; }
+        
+        .vip-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--gold); color: #000; font-size: 0.7rem;
+            font-weight: bold; padding: 4px 8px; border-radius: 4px;
+        }
+
+        .cliente-nome { font-size: 1.2rem; font-weight: bold; color: var(--primary); margin: 0 0 10px 0; display: block; }
+        .cliente-info { font-size: 0.9rem; color: #555; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        
+        .gasto-total {
+            margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .gasto-valor { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+        .data-label { font-size: 0.8rem; color: #999; }
+
+        @media (max-width: 600px) {
+            .header-section h1 { font-size: 1.6rem; }
+            .clientes-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -45,44 +80,50 @@
             Painel Bistaka
         </div>
         <div class="nav-links">
-             <a href="/admin/dashboard">🍳 Cozinha</a>
+            <a href="/admin/dashboard">🍳 Cozinha</a>
             <a href="/admin">🍔 Cardápio</a>
             <a href="/admin/relatorio">📊 Dia</a>
             <a href="/admin/relatorio_mensal">📈 Mês</a>
-            <a href="/admin/clientes" style="background: #27ae60;">👥 Clientes</a>
+            <a href="/admin/clientes" style="background: var(--accent);">👥 Clientes</a>
             <a href="/admin/configuracoes" style="background: #e67e22;">⚙️ Config</a>
-            <a href="/" target="_blank" style="background: transparent; border: 1px solid #bdc3c7;">🌐 Ver Site</a>
         </div>
     </nav>
-    <div class="container">
-        <h1>👥 Base de Clientes</h1>
-        <p>Listagem de clientes ordenada por quem tem o maior gasto histórico.</p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Telefone</th>
-                    <th>Endereço</th>
-                    <th>Último Pedido</th>
-                    <th>Total Gasto</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in clientes %}
-                <tr>
-                    <td>
-                        {{ c.nome }}
-                        {% if c.total_gasto > 200 %} <span class="badge-ouro">VIP</span> {% endif %}
-                    </td>
-                    <td>{{ c.telefone }}</td>
-                    <td>{{ c.endereco }}, {{ c.bairro }}</td>
-                    <td>{{ c.ultimo_pedido[0:10] }}</td>
-                    <td style="color: green; font-weight: bold;">R$ {{ "%.2f"|format(c.total_gasto) }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="container">
+        <div class="header-section">
+            <h1>👥 Base de Clientes</h1>
+            <p>Os clientes que mais amam o Bistaka Lanches</p>
+        </div>
+
+        <div class="clientes-grid">
+            {% for c in clientes %}
+            <div class="cliente-card {% if c.total_gasto > 200 %}vip{% endif %}">
+                {% if c.total_gasto > 200 %}
+                    <span class="vip-badge">🏆 CLIENTE VIP</span>
+                {% endif %}
+                
+                <span class="cliente-nome">{{ c.nome }}</span>
+                
+                <div class="cliente-info">📞 {{ c.telefone }}</div>
+                <div class="cliente-info">📍 {{ c.endereco }}</div>
+                <div class="cliente-info">🏘️ {{ c.bairro }}</div>
+                
+                <div class="gasto-total">
+                    <div>
+                        <span class="data-label">Último pedido em:</span><br>
+                        <strong>{{ c.ultimo_pedido[8:10] }}/{{ c.ultimo_pedido[5:7] }}/{{ c.ultimo_pedido[0:4] }}</strong>
+                    </div>
+                    <div class="gasto-valor">R$ {{ "%.2f"|format(c.total_gasto) }}</div>
+                </div>
+
+                <a href="https://wa.me/55{{ c.telefone|replace('(', '')|replace(')', '')|replace('-', '')|replace(' ', '') }}" 
+                   target="_blank" 
+                   style="display: block; text-align: center; margin-top: 15px; padding: 10px; background: #25d366; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem;">
+                   💬 Chamar no WhatsApp
+                </a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>

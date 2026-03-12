@@ -2,76 +2,144 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório Mensal</title>
-    <link rel="icon" type="image/png" href="static/uploads/logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-         .admin-navbar {
-            background: #2c3e50; color: white; padding: 15px 20px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
-        .admin-navbar .brand {
-            font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .admin-navbar .nav-links {
-            display: flex; gap: 10px; flex-wrap: wrap; }
-        .admin-navbar a {
-            color: white; text-decoration: none; padding: 8px 15px; 
-            border-radius: 5px; background: rgba(255,255,255,0.1); 
-            transition: background 0.2s; font-size: 0.95rem; font-family: sans-serif; }
+      body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
+        .container { max-width: 1000px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        
+        .resumo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .card { background: #ecf0f1; padding: 15px 20px; border-radius: 8px; font-size: 1.1rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .card span:first-child { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
+        .card span:last-child { color: #2c3e50; font-weight: bold; font-size: 1.3rem; }
+        
+        .card.destaque { background: #8e44ad; color: white; grid-column: 1 / -1; flex-direction: row; justify-content: space-between; padding: 20px; font-size: 1.5rem; }
+        .card.destaque span:first-child { color: rgba(255,255,255,0.8); margin: 0; }
+        .card.destaque span:last-child { color: white; font-size: 1.8rem; }
+        
+        /* Navbar */
+        .admin-navbar { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
+        .admin-navbar .brand { font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .admin-navbar .nav-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .admin-navbar a { color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; background: rgba(255,255,255,0.1); transition: background 0.2s; font-size: 0.95rem; }
         .admin-navbar a:hover { background: rgba(255,255,255,0.25); }
-        @media print { 
-        .admin-navbar { display: none !important; } }
-        body {
-             font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-        .container {
-             max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 {
-             text-align: center; color: #2c3e50; margin-bottom: 5px; }
-        .card {
-             background: #ecf0f1; padding: 15px 20px; margin: 10px 0; border-radius: 8px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center;}
-        .card.destaque {
-             background: #27ae60; color: white; font-weight: bold; font-size: 1.4rem; border: none; }
-        .btn-voltar {
-             display: block; text-align: center; margin-top: 25px; padding: 12px; background: #34495e; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        .btn-voltar:hover {
-             background: #2c3e50; }
+
+        /* Estilo Base da Tabela (Desktop) */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #34495e; color: white; font-weight: bold; }
+        tr:hover { background-color: #f9f9f9; }
+        .itens-lista { white-space: pre-wrap; font-size: 0.9rem; color: #555; background: #f1f1f1; padding: 8px; border-radius: 5px; }
+
+        /* ================================================== */
+        /* MÁGICA DA RESPONSIVIDADE (CELULARES)               */
+        /* ================================================== */
+        @media (max-width: 768px) {
+            .container { padding: 15px; margin: 15px; }
+            .card.destaque { flex-direction: column; gap: 10px; text-align: center; }
+            .admin-navbar { justify-content: center; flex-direction: column; }
+            
+            /* Oculta o cabeçalho original da tabela */
+            table thead { display: none; }
+            
+            /* Transforma as linhas em blocos/cartões */
+            table, table tbody, table tr, table td { display: block; width: 100%; box-sizing: border-box; }
+            
+            table tr { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+            
+            /* Configura as células para mostrar o rótulo do lado esquerdo */
+            table td { 
+                text-align: right; 
+                padding-left: 45%; 
+                position: relative; 
+                border-bottom: 1px solid #eee; 
+                min-height: 40px;
+            }
+            table td:last-child { border-bottom: none; background: #f8fcf8; }
+            
+            /* Injeta o nome da coluna que está no HTML (data-label) */
+            table td::before { 
+                content: attr(data-label); 
+                position: absolute; 
+                left: 15px; 
+                width: 40%; 
+                text-align: left; 
+                font-weight: bold; 
+                color: #34495e; 
+            }
+
+            /* Alinha os itens da lista pra direita no mobile */
+            .itens-lista { text-align: right; background: transparent; padding: 0; }
+        }
     </style>
 </head>
 <body>
     <nav class="admin-navbar">
-    <div class="brand">
-        <img src="/static/uploads/logo.png" style="height: 35px; width: 35px; border-radius: 50%; object-fit: cover;">
-        Painel Bistaka
-    </div>
+        <div class="brand"><img src="/static/uploads/logo.png" style="height: 35px; width: 35px; border-radius: 50%; object-fit: cover;">Painel Bistaka</div>
         <div class="nav-links">
-             <a href="/admin/dashboard">🍳 Cozinha</a>
+            <a href="/admin/dashboard">🍳 Cozinha</a>
             <a href="/admin">🍔 Cardápio</a>
             <a href="/admin/relatorio">📊 Dia</a>
-            <a href="/admin/relatorio_mensal">📈 Mês</a>
-            <a href="/admin/clientes" style="background: #27ae60;">👥 Clientes</a>
+            <a href="/admin/relatorio_mensal" style="background: #e67e22;">📈 Mês</a>
+            <a href="/admin/clientes">👥 Clientes</a>
             <a href="/admin/configuracoes">⚙️ Config</a>
-            <a href="/" target="_blank" style="background: transparent; border: 1px solid #bdc3c7;">🌐 Ver Site</a>
         </div>
     </nav>
+
     <div class="container">
         <h1>📈 Faturamento Mensal</h1>
         <p style="text-align: center; color: #7f8c8d; margin-top: 0; margin-bottom: 25px;">Referência: {{ mes }}</p>
         
-        <div class="card destaque">
-            <span>Total do Mês:</span>
-            <span>R$ {{ "%.2f"|format(bruto) }}</span>
-        </div>
-        
-        <div class="card">
-            <span>🍔 Pedidos Finalizados:</span>
-            <span><strong>{{ qtd }}</strong></span>
+        <div class="resumo-grid">
+            <div class="card destaque">
+                <span>Faturamento Bruto</span>
+                <span>R$ {{ "%.2f"|format(bruto) }}</span>
+            </div>
+            
+            <div class="card"><span>🍔 Pedidos</span><span>{{ qtd }}</span></div>
+            <div class="card"><span>📱 Pix</span><span style="color: #27ae60;">R$ {{ "%.2f"|format(pix) }}</span></div>
+            <div class="card"><span>💳 Cartão</span><span style="color: #2980b9;">R$ {{ "%.2f"|format(cartao) }}</span></div>
+            <div class="card"><span>💵 Dinheiro</span><span style="color: #d35400;">R$ {{ "%.2f"|format(dinheiro) }}</span></div>
         </div>
 
-        <h3 style="margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #34495e;">Resumo por Pagamento</h3>
-        <div class="card"><span>📱 Pix:</span><span style="color: #27ae60; font-weight: bold;">R$ {{ "%.2f"|format(pix) }}</span></div>
-        <div class="card"><span>💳 Cartão:</span><span style="color: #2980b9; font-weight: bold;">R$ {{ "%.2f"|format(cartao) }}</span></div>
-        <div class="card"><span>💵 Dinheiro:</span><span style="color: #d35400; font-weight: bold;">R$ {{ "%.2f"|format(dinheiro) }}</span></div>
+        <h3 style="margin-top: 40px; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #34495e;">📋 Histórico de Pedidos do Mês</h3>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data / Hora</th>
+                        <th>Cliente</th>
+                        <th>Resumo do Pedido</th>
+                        <th>Pagamento</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in pedidos %}
+                    <tr>
+                        <td>
+                            <strong>#{{ p.id }}</strong><br>
+                            <small style="color: #7f8c8d;">{{ p.data_pedido[8:10] }}/{{ p.data_pedido[5:7] }} às {{ p.data_pedido[11:16] }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ p.nome or 'Cliente Site' }}</strong><br>
+                            <small style="color: #7f8c8d;">{{ p.cliente_telefone }}</small>
+                        </td>
+                        <td>
+                            <div class="itens-lista">{{ p.itens }}</div>
+                        </td>
+                        <td>{{ p.metodo_pagamento }}</td>
+                        <td style="color: green; font-weight: bold;">R$ {{ "%.2f"|format(p.total) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #999;">Nenhum pedido finalizado neste mês ainda.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

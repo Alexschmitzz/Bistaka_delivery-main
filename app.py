@@ -1,12 +1,9 @@
 import sqlite3
-from flask_minify import Minify
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from datetime import datetime
 import json
 import os
 from werkzeug.utils import secure_filename
-
-Minify(app=app, html=True, js=True, css=True)
 
 app = Flask(__name__)
 app.secret_key = 'segredo_do_lucao_lanches' # Necessário para login e sessões

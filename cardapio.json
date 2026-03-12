@@ -34,7 +34,7 @@
                 "preco": 0.0
             }
         ],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 21,
@@ -61,7 +61,7 @@
                 "preco": 1.0
             }
         ],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 20,
@@ -88,7 +88,7 @@
                 "preco": 1.0
             }
         ],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 22,
@@ -115,7 +115,7 @@
                 "preco": 1.0
             }
         ],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 3,
@@ -124,7 +124,53 @@
         "desc": "Hambúrguer com 130g, presunto, mussarela, 100g de coração suculento, alface, tomate, picles, milho, ervilha, maionese, ketchup e batata palha. Um sabor único e irresistível.",
         "preco": 33.0,
         "img": "https://client-assets.anota.ai/produtos/685f1134f6e78e001924171d/-1753238454818blob_600.webp",
-        "ativo": true
+        "ativo": true,
+        "adicionais": [
+            {
+                "nome": "HAMBURGUER",
+                "preco": 10.0
+            },
+            {
+                "nome": "BACON",
+                "preco": 7.0
+            },
+            {
+                "nome": "CALABRESA",
+                "preco": 6.0
+            },
+            {
+                "nome": "GALINHA",
+                "preco": 9.0
+            },
+            {
+                "nome": "SALSICHA",
+                "preco": 3.0
+            },
+            {
+                "nome": "OVO",
+                "preco": 3.0
+            },
+            {
+                "nome": "CORAÇÃO",
+                "preco": 9.0
+            },
+            {
+                "nome": "PRESUNTO",
+                "preco": 3.0
+            },
+            {
+                "nome": "QUEIJO",
+                "preco": 3.0
+            },
+            {
+                "nome": "SALADA",
+                "preco": 3.0
+            },
+            {
+                "nome": "BATATA PALHA",
+                "preco": 3.0
+            }
+        ]
     },
     {
         "id": 8,
@@ -210,7 +256,8 @@
         "desc": "Dog Prensado Salsicha, recheado com 2 salsichas, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
         "preco": 26.0,
         "img": "/static/uploads/dogprensado.jpg",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": false
     },
     {
         "id": 16,
@@ -219,7 +266,8 @@
         "desc": "Dog Calabresa, com 2 salsichas, calabresa, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
         "preco": 30.0,
         "img": "/static/uploads/dogprensado.jpg",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": false
     },
     {
         "id": 17,
@@ -228,7 +276,8 @@
         "desc": "Dog Galinha, com 2 salsichas, galinha desfiada, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
         "preco": 32.0,
         "img": "/static/uploads/dogprensado.jpg",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": false
     },
     {
         "id": 18,
@@ -237,7 +286,8 @@
         "desc": "Dog Coração, com 2 salsichas, coração, repolho, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
         "preco": 33.0,
         "img": "/static/uploads/dogprensado.jpg",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": false
     },
     {
         "id": 23,
@@ -286,6 +336,28 @@
             },
             {
                 "nome": "Guaraná",
+                "preco": 0.0
+            }
+        ]
+    },
+    {
+        "id": 28,
+        "categoria": "Bebidas",
+        "nome": "Refrigerante 2l",
+        "desc": "Escolha seu refri",
+        "preco": 16.0,
+        "img": "/static/uploads/202508031816_7162_i.jpg",
+        "adicionais": [
+            {
+                "nome": "Coca Cola 2l",
+                "preco": 0.0
+            },
+            {
+                "nome": "Coca-Cola Zero 2L",
+                "preco": 0.0
+            },
+            {
+                "nome": "Guaraná Antárctica 2l",
                 "preco": 0.0
             }
         ]

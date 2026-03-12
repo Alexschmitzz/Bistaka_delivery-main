@@ -1,5 +1,5 @@
 {
-    "status_manual": "automatico",
+    "status_manual": "aberto",
     "hora_abertura": "19:00",
     "hora_fechamento": "23:59",
     "dias_fechados": [

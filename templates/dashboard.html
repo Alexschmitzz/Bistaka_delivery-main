@@ -47,7 +47,7 @@
             transition: background 0.2s;
         }
         .card-pedido:hover { background: #f9f9f9; }
-        .card-pedido.novo { background: #e8f5e9; border-left: 5px solid #2ecc71; } /* Destaque verde para novos */
+        .card-pedido.novo { background: #e8f5e9; border-left: 5px solid #2ecc71; }
 
         .info-pedido h3 { margin: 0; font-size: 1.2rem; color: #333; }
         .info-pedido p { margin: 5px 0 0; color: #666; font-size: 0.95rem; }
@@ -59,73 +59,51 @@
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .btn-imprimir:hover { background: #000; }
+        
+        /* Estilo do novo botão do WhatsApp */
+        .btn-wpp-cliente {
+            background: #25d366; color: white; border: none; padding: 10px 20px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-top: 5px;
+        }
+        .btn-wpp-cliente:hover { background: #20bd5a; }
 
         /* --- ADAPTAÇÃO PARA CELULAR (Mobile) --- */
         @media (max-width: 768px) {
             body { padding: 5px; background: #f5f6fa; }
-            .painel-container { 
-                padding: 15px; 
-                height: 98vh; 
-                border-radius: 10px;
-                box-shadow: none; /* Tira a sombra grossa no celular */
-            }
-            
-            /* Ajusta o título e os botões do topo */
+            .painel-container { padding: 15px; height: 98vh; border-radius: 10px; box-shadow: none; }
             h1 { flex-direction: column; gap: 15px; font-size: 1.5rem; text-align: center; }
             h1 div { display: flex; width: 100%; justify-content: space-between; gap: 10px; }
             h1 div a, h1 div button { flex: 1; text-align: center; margin: 0; }
-
-            /* Ajusta os cards dos pedidos para não espremer */
-            .card-pedido { 
-                flex-direction: column; 
-                align-items: stretch; /* Estica os itens para preencher a tela */
-                gap: 15px; 
-            }
+            .card-pedido { flex-direction: column; align-items: stretch; gap: 15px; }
             .info-pedido { padding-right: 0 !important; }
-            
-            /* Coloca os botões de ação lado a lado embaixo do pedido */
-            .card-pedido > div:last-child { 
-                flex-direction: row !important; 
-                gap: 10px; 
-                min-width: 100%; 
-            }
+            .card-pedido > div:last-child { flex-direction: column !important; gap: 5px; min-width: 100%; }
             .card-pedido button { flex: 1; margin: 0 !important; font-size: 0.9rem; }
+            .btn-wpp-cliente { margin-top: 0 !important; } /* Ajuste de margem no mobile */
         }
 
         /* --- MÁGICA DA IMPRESSÃO TÉRMICA (80mm) --- */
-        #cupom-fiscal { display: none; } /* Esconde na tela normal */
+        #cupom-fiscal { display: none; }
 
        @media print {
-    /* Esconde TUDO da tela do PC */
-    body * { visibility: hidden; }
-    .painel-container, .btn-imprimir { display: none; }
-
-    /* Mostra SÓ o cupom */
-    #cupom-fiscal, #cupom-fiscal * {
-        visibility: visible; display: block;
-    }
-    
-    #cupom-fiscal {
-        position: absolute; left: 0; top: 0; width: 80mm; /* Largura padrão térmica */
-        font-family: 'Courier New', monospace !important; /* Fonte tipo recibo */
-        font-size: 13px !important; /* Aumentei para 13px para dar mais clareza térmica */
-        line-height: 1.2; padding: 0; margin: 0;
-        
-        /* REGRAS OBRIGATÓRIAS PARA IMPRESSORA TÉRMICA FICAR BEM PRETA */
-        color: #000000 !important;
-        background-color: #FFFFFF !important;
-        font-weight: bold !important; /* Aumenta a área de queima do papel */
-        -webkit-font-smoothing: none !important; /* Remove o esfumaçado da fonte */
-        text-rendering: crispEdges !important; /* Deixa os pixels da letra duros */
-    }
-
-    /* Formatação do Recibo */
-    .recibo-header { text-align: center; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
-    .recibo-body { margin-bottom: 10px; border-bottom: 1px dashed black; padding-bottom: 5px; }
-    .recibo-item { display: flex; justify-content: space-between; }
-    .recibo-total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px; }
-    .recibo-footer { text-align: center; font-size: 10px; margin-top: 10px; }
-}
+            body * { visibility: hidden; }
+            .painel-container, .btn-imprimir, .btn-wpp-cliente { display: none; }
+            #cupom-fiscal, #cupom-fiscal * { visibility: visible; display: block; }
+            #cupom-fiscal {
+                position: absolute; left: 0; top: 0; width: 80mm; 
+                font-family: 'Courier New', monospace !important; 
+                font-size: 13px !important; line-height: 1.2; padding: 0; margin: 0;
+                color: #000000 !important; background-color: #FFFFFF !important;
+                font-weight: bold !important; -webkit-font-smoothing: none !important; 
+                text-rendering: crispEdges !important; 
+            }
+            .recibo-header { text-align: center; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
+            .recibo-body { margin-bottom: 10px; border-bottom: 1px dashed black; padding-bottom: 5px; }
+            .recibo-item { display: flex; justify-content: space-between; }
+            .recibo-total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 5px; }
+            .recibo-footer { text-align: center; font-size: 10px; margin-top: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -135,7 +113,7 @@
         Painel Bistaka
     </div>
         <div class="nav-links">
-             <a href="/admin/dashboard" style="background: #e67e22;">🍳 Cozinha</a>
+            <a href="/admin/dashboard" style="background: #e67e22;">🍳 Cozinha</a>
             <a href="/admin">🍔 Cardápio</a>
             <a href="/admin/relatorio">📊 Dia</a>
             <a href="/admin/relatorio_mensal">📈 Mês</a>
@@ -161,10 +139,7 @@
 <div id="cupom-fiscal"></div>
 
 <script>
-    // Configurações
     let ultimoId = 0;
-
-    // Toca um som quando chega pedido novo (opcional)
     const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
 
     async function buscarPedidos() {
@@ -173,7 +148,7 @@
             const pedidos = await response.json();
             
             const lista = document.getElementById('lista');
-            lista.innerHTML = ''; // Limpa e refaz (poderia ser otimizado, mas pra local tá ótimo)
+            lista.innerHTML = ''; 
 
             if (pedidos.length > 0 && pedidos[0].id > ultimoId) {
                 if (ultimoId !== 0) audio.play();
@@ -181,7 +156,6 @@
             }
 
             pedidos.forEach(p => {
-              
                 const statusAtual = p.status || 'producao';
                 
                 if (statusAtual === 'finalizado') return;
@@ -221,10 +195,13 @@
                             <p style="color: green; font-weight:bold; margin-top: 10px;">Total: R$ ${p.total.toFixed(2)} (${p.pagamento})</p>
                         </div>
                         
-                        <div style="display: flex; flex-direction: column; justify-content: center; min-width: 130px;">
+                        <div style="display: flex; flex-direction: column; justify-content: center; min-width: 140px;">
                             ${botaoStatusHtml}
                             <button class="btn-imprimir" onclick='imprimirComanda(${JSON.stringify(p)})' style="width: 100%;">
                                 🖨️ Imprimir
+                            </button>
+                            <button class="btn-wpp-cliente" onclick='avisarClienteWpp(${JSON.stringify(p)})' style="width: 100%;">
+                                📱 Avisar Cliente
                             </button>
                         </div>
                     </div>
@@ -236,10 +213,34 @@
         }
     }
 
+    // --- NOVA FUNÇÃO PARA ENVIAR ZAP PRO CLIENTE ---
+    function avisarClienteWpp(pedido) {
+        // Limpa o número de telefone (tira traços, espaços, parênteses)
+        let telefoneNum = pedido.cliente.replace(/\D/g, '');
+        
+        // Se o número tiver 10 ou 11 dígitos (padrão Brasil com DDD), adiciona o 55 na frente
+        if (telefoneNum.length === 10 || telefoneNum.length === 11) {
+            telefoneNum = '55' + telefoneNum;
+        }
+
+        // Prepara a lista de itens (já vem com as quebras de linha corretas do banco)
+        let listaItens = pedido.itens ? pedido.itens.trim() : '';
+
+        // Monta o texto do Zap
+        let texto = `Olá *${pedido.nome}*!\n\nSeu pedido *#${pedido.id}* já está em produção 👨‍🍳🔥\n\n`;
+        texto += `*Itens do Pedido:*\n${listaItens}\n\n`;
+        texto += `*Valor Total:* R$ ${pedido.total.toFixed(2)}\n\n`;
+        texto += `Fique de olho, logo avisaremos quando estiver pronto! 😉`;
+
+        // Gera o link e abre a conversa
+        let linkWpp = `https://wa.me/${telefoneNum}?text=${encodeURIComponent(texto)}`;
+        window.open(linkWpp, '_blank');
+    }
+
     function imprimirComanda(p) {
         const cupom = document.getElementById('cupom-fiscal');
         
-      let itensHtml = p.itens ? p.itens.trim().split('\n').map(linha => {
+        let itensHtml = p.itens ? p.itens.trim().split('\n').map(linha => {
             if(linha) return `<div class="recibo-item" style="margin-bottom: 5px;"><span>${linha}</span></div>`;
             return '';
         }).join('') : '';
@@ -273,7 +274,6 @@
                 Obrigado pela preferência!<br>
                  www.bistaka.com.br
             <br>
-            
             </div>
         `;
 

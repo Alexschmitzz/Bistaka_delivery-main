@@ -79,56 +79,6 @@ def api_cardapio():
     itens_ativos = [item for item in itens if item.get('ativo', True)]
     return jsonify(itens_ativos)
 
-# ROTA 3: Salvar Pedido no Banco antes de ir pro WhatsApp
-@app.route('/api/salvar_pedido', methods=['POST'])
-def salvar_pedido():
-    dados = request.json
-    agora_server = datetime.now()
-    # 0 = Segunda-feira. hour < 19 = Antes das 19h.
-    if agora_server.weekday() == 0 or agora_server.hour < 19:
-        return jsonify({"status": "erro", "msg": "A loja está fechada no momento!"}), 403
-    # ==========================================
-    telefone = dados.get('telefone')
-    nome = dados.get('nome', 'Cliente Site')
-    endereco = dados.get('endereco')
-    bairro = dados.get('bairro')
-    total = float(dados.get('total'))
-    pagamento = dados.get('pagamento')
-    itens_texto = dados.get('resumo_itens')
-    agora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # 1. Atualiza ou Cria Cliente
-        cursor.execute('SELECT * FROM clientes WHERE telefone = ?', (telefone,))
-        cliente_existente = cursor.fetchone()
-
-        if cliente_existente:
-            cursor.execute('''
-                UPDATE clientes SET 
-                    endereco = ?, bairro = ?, ultimo_pedido = ?, total_gasto = total_gasto + ?
-                WHERE telefone = ?
-            ''', (endereco, bairro, agora, total, telefone))
-        else:
-            cursor.execute('''
-                INSERT INTO clientes (telefone, nome, endereco, bairro, primeiro_pedido, ultimo_pedido, total_gasto)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (telefone, nome, endereco, bairro, agora, agora, total))
-
-        # 2. Registra o Pedido
-        cursor.execute('''
-            INSERT INTO pedidos (cliente_telefone, itens, total, data_pedido, metodo_pagamento)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (telefone, itens_texto, total, agora, pagamento))
-
-        conn.commit()
-        conn.close()
-        return jsonify({"status": "sucesso", "msg": "Pedido salvo!"})
-    except Exception as e:
-        print(f"Erro ao salvar pedido: {e}")
-        return jsonify({"status": "erro", "msg": str(e)}), 500
 
 # --- ROTAS ADMINISTRATIVAS ---
 CONFIG_FILE = 'config_loja.json'
@@ -190,8 +140,8 @@ def salvar_pedido():
 # --- NOVA ROTA: TELA DE CONFIGURAÇÕES ---
 @app.route('/admin/configuracoes', methods=['GET', 'POST'])
 def configuracoes():
-    # Bloqueia se não for o chefe
-    if not session.get('logged_in') or session.get('role') != 'admin': 
+    # Trava corrigida: agora ela só exige estar logado!
+    if not session.get('logged_in'): 
         return redirect(url_for('login'))
     
     config = load_config()

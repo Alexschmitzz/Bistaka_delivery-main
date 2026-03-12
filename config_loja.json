@@ -1,0 +1,8 @@
+{
+    "status_manual": "fechado",
+    "hora_abertura": "19:00",
+    "hora_fechamento": "23:59",
+    "dias_fechados": [
+        0
+    ]
+}

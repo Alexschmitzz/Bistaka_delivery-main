@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurações da Loja</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; margin-bottom: 20px; text-align: center; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; }
+        select, input[type="time"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+        
+        .dias-folga { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .dias-folga label { background: #eee; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: normal; }
+        
+        .btn-salvar { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-salvar:hover { background: #219653; }
+
+        /* Navbar */
+        .admin-navbar { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
+        .admin-navbar .brand { font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .admin-navbar .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+        .admin-navbar a { color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; background: rgba(255,255,255,0.1); transition: background 0.2s; font-size: 0.95rem; }
+        .admin-navbar a:hover { background: rgba(255,255,255,0.25); }
+    </style>
+</head>
+<body>
+    <nav class="admin-navbar">
+        <div class="brand"><img src="/static/uploads/logo.png" style="height: 35px; width: 35px; border-radius: 50%; object-fit: cover;">Painel Bistaka</div>
+        <div class="nav-links">
+            <a href="/admin/dashboard">🍳 Cozinha</a>
+            <a href="/admin">🍔 Cardápio</a>
+            <a href="/admin/relatorio">📊 Dia</a>
+            <a href="/admin/relatorio_mensal">📈 Mês</a>
+            <a href="/admin/clientes">👥 Clientes</a>
+            <a href="/admin/configuracoes" style="background: #e67e22;">⚙️ Config</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>⚙️ Configurações de Abertura</h1>
+        
+        <form method="POST" action="/admin/configuracoes">
+            
+            <div class="form-group" style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 5px solid #f1c40f;">
+                <label>🚦 Status de Emergência (Sobrescreve relógio)</label>
+                <select name="status_manual">
+                    <option value="automatico" {% if config.status_manual == 'automatico' %}selected{% endif %}>🤖 Automático (Segue Horário Padrão)</option>
+                    <option value="aberto" {% if config.status_manual == 'aberto' %}selected{% endif %}>🟢 Forçar ABERTO Agora</option>
+                    <option value="fechado" {% if config.status_manual == 'fechado' %}selected{% endif %}>🔴 Forçar FECHADO Agora</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>🕒 Horário de Abertura</label>
+                    <input type="time" name="hora_abertura" value="{{ config.hora_abertura }}" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>🕦 Horário de Fechamento</label>
+                    <input type="time" name="hora_fechamento" value="{{ config.hora_fechamento }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>📅 Dias de Folga (Marcados ficarão fechados)</label>
+                <div class="dias-folga">
+                    <label><input type="checkbox" name="dias_fechados" value="0" {% if 0 in config.dias_fechados %}checked{% endif %}> Segunda</label>
+                    <label><input type="checkbox" name="dias_fechados" value="1" {% if 1 in config.dias_fechados %}checked{% endif %}> Terça</label>
+                    <label><input type="checkbox" name="dias_fechados" value="2" {% if 2 in config.dias_fechados %}checked{% endif %}> Quarta</label>
+                    <label><input type="checkbox" name="dias_fechados" value="3" {% if 3 in config.dias_fechados %}checked{% endif %}> Quinta</label>
+                    <label><input type="checkbox" name="dias_fechados" value="4" {% if 4 in config.dias_fechados %}checked{% endif %}> Sexta</label>
+                    <label><input type="checkbox" name="dias_fechados" value="5" {% if 5 in config.dias_fechados %}checked{% endif %}> Sábado</label>
+                    <label><input type="checkbox" name="dias_fechados" value="6" {% if 6 in config.dias_fechados %}checked{% endif %}> Domingo</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-salvar">💾 Salvar Configurações</button>
+        </form>
+    </div>
+</body>
+</html>

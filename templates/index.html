@@ -357,19 +357,50 @@
 
     };
 
-    function verificarHorario() {
-        const agora = new Date();
-        const hora = agora.getHours();
-        if (hora >= HORA_ABERTURA && hora <= HORA_FECHAMENTO) {
-            document.getElementById('status-loja').innerText = "ABERTO";
-            document.getElementById('status-loja').className = "status-badge status-open";
-            document.getElementById('aviso-fechado').style.display = 'none';
-        } else {
-            document.getElementById('status-loja').innerText = "FECHADO";
-            document.getElementById('status-loja').className = "status-badge status-closed";
-            document.getElementById('aviso-fechado').style.display = 'flex';
+    async function verificarHorario() {
+        try {
+            // O site agora pergunta pro Python: "A loja tá aberta?"
+            const response = await fetch('/api/status_loja');
+            const status_loja = await response.json();
+            
+            const badgeStatus = document.getElementById('status-loja');
+            const avisoFechado = document.getElementById('aviso-fechado');
+            const menuContainer = document.getElementById('menu-container');
+            const cartBar = document.querySelector('.cart-bar');
+
+            if (status_loja.aberto === true) {
+                // LOJA ABERTA 🟢
+                if (badgeStatus) {
+                    badgeStatus.textContent = 'ABERTO';
+                    badgeStatus.className = 'status-badge status-open';
+                }
+                if (avisoFechado) avisoFechado.style.display = 'none';
+                if (menuContainer) menuContainer.style.display = 'block';
+            } else {
+                // LOJA FECHADA 🔴
+                if (badgeStatus) {
+                    badgeStatus.textContent = 'FECHADO';
+                    badgeStatus.className = 'status-badge status-closed';
+                }
+                // Mostra a mensagem oficial que veio do Python!
+                if (avisoFechado) {
+                    avisoFechado.style.display = 'block';
+                    avisoFechado.innerHTML = `
+                        <div style="font-size: 4rem;">🔒</div>
+                        <h2 style="margin: 20px 0 10px;">Estamos Fechados!</h2>
+                        <p>${status_loja.mensagem}</p>
+                    `;
+                }
+                if (menuContainer) menuContainer.style.display = 'none';
+                if (cartBar) cartBar.classList.remove('cart-bar.visible');
+            }
+        } catch (error) {
+            console.error("Erro ao verificar status da loja:", error);
         }
     }
+
+    verificarHorario();
+    setInterval(verificarHorario, 60000);
 
     function renderizarMenu() {
         const container = document.getElementById('menu-container');

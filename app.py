@@ -86,7 +86,11 @@ def api_cardapio():
 @app.route('/api/salvar_pedido', methods=['POST'])
 def salvar_pedido():
     dados = request.json
-    
+    agora_server = datetime.now()
+    # 0 = Segunda-feira. hour < 19 = Antes das 19h.
+    if agora_server.weekday() == 0 or agora_server.hour < 19:
+        return jsonify({"status": "erro", "msg": "A loja está fechada no momento!"}), 403
+    # ==========================================
     telefone = dados.get('telefone')
     nome = dados.get('nome', 'Cliente Site')
     endereco = dados.get('endereco')
@@ -130,6 +134,85 @@ def salvar_pedido():
         return jsonify({"status": "erro", "msg": str(e)}), 500
 
 # --- ROTAS ADMINISTRATIVAS ---
+CONFIG_FILE = 'config_loja.json'
+
+def load_config():
+    # Se o arquivo não existir, cria um com o padrão: Automático, 19h às 23h59, folga Segunda(0)
+    if not os.path.exists(CONFIG_FILE): 
+        return {
+            "status_manual": "automatico", 
+            "hora_abertura": "19:00", 
+            "hora_fechamento": "23:59", 
+            "dias_fechados": [0]
+        }
+    with open(CONFIG_FILE, 'r', encoding='utf-8') as f: 
+        return json.load(f)
+
+def save_config(data):
+    with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+# O "Cérebro" que decide se a loja tá aberta ou não
+def is_loja_aberta():
+    config = load_config()
+    
+    # 1. Se você forçou no painel, ele ignora o relógio
+    if config['status_manual'] == 'aberto': return True, "Loja aberta manualmente!"
+    if config['status_manual'] == 'fechado': return False, "Estamos fechados por motivo de força maior."
+    
+    # 2. Se estiver automático, ele olha pro relógio e pro calendário
+    agora = datetime.now()
+    dia_semana = agora.weekday() # 0=Segunda, 1=Terça...
+    hora_atual = agora.strftime('%H:%M') # Fica no formato "19:30"
+    
+    if dia_semana in config.get('dias_fechados', []):
+        return False, "Hoje é nosso dia de descanso!"
+        
+    if hora_atual < config['hora_abertura'] or hora_atual > config['hora_fechamento']:
+        return False, f"Abrimos das {config['hora_abertura']} às {config['hora_fechamento']}."
+        
+    return True, "Loja Aberta"
+
+# --- ROTA QUE AVISA O SITE SE TÁ ABERTO ---
+@app.route('/api/status_loja')
+def api_status_loja():
+    aberto, msg = is_loja_aberta()
+    return jsonify({"aberto": aberto, "mensagem": msg})
+
+# --- A TRAVA NO INÍCIO DO salvar_pedido ---
+@app.route('/api/salvar_pedido', methods=['POST'])
+def salvar_pedido():
+    dados = request.json
+    
+    aberto, msg = is_loja_aberta()
+    if not aberto:
+        return jsonify({"status": "erro", "msg": msg}), 403
+        
+    # ... (o resto do código do salvar_pedido continua igual daqui pra baixo!)
+
+# --- NOVA ROTA: TELA DE CONFIGURAÇÕES ---
+@app.route('/admin/configuracoes', methods=['GET', 'POST'])
+def configuracoes():
+    # Bloqueia se não for o chefe
+    if not session.get('logged_in') or session.get('role') != 'admin': 
+        return redirect(url_for('login'))
+    
+    config = load_config()
+    
+    # Se o formulário foi enviado (você clicou em Salvar)
+    if request.method == 'POST':
+        config['status_manual'] = request.form['status_manual']
+        config['hora_abertura'] = request.form['hora_abertura']
+        config['hora_fechamento'] = request.form['hora_fechamento']
+        
+        # Pega as caixinhas dos dias de folga que você marcou
+        dias = request.form.getlist('dias_fechados')
+        config['dias_fechados'] = [int(d) for d in dias]
+        
+        save_config(config)
+        return redirect(url_for('configuracoes'))
+        
+    return render_template('configuracoes.html', config=config)
 
 # ROTA 4: Login
 @app.route('/login', methods=['GET', 'POST'])

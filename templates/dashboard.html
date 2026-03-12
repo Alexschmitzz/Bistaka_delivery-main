@@ -301,11 +301,21 @@
             alert("Erro ao atualizar o pedido.");
         }
     }
-    // Atualiza a cada 10 segundos
-    setInterval(buscarPedidos, 10000);
+   // ==========================================
+    // RÁDIO RECEPTOR DE NOVOS PEDIDOS (SSE)
+    // ==========================================
+    const fonteEventos = new EventSource('/api/stream_pedidos');
     
-    // Busca na hora que abre
+    // Fica escutando a antena do servidor...
+    fonteEventos.onmessage = function(event) {
+        console.log("Sinal recebido do servidor: TEM PEDIDO NOVO!");
+        // Só agora ele vai lá e busca a lista atualizada
+        buscarPedidos(); 
+    };
+
+    // Mantém a busca inicial quando a tela carrega pela primeira vez
     buscarPedidos();
+    // Busca na hora que abre
 </script>
 
 </body>

@@ -1,5 +1,6 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+import time
 from datetime import datetime
 import json
 import os
@@ -364,6 +365,29 @@ def api_pedidos_hoje():
 
         })
     return jsonify(lista_pedidos)
+
+# ROTA: Antena de Eventos (SSE) para a Cozinha
+@app.route('/api/stream_pedidos')
+def stream_pedidos():
+    def event_stream():
+        ultimo_id_conhecido = 0
+        while True:
+            # Dá uma olhadinha rápida só para ver qual é o ID do último pedido
+            conn = get_db_connection()
+            cursor = conn.execute('SELECT MAX(id) FROM pedidos')
+            max_id = cursor.fetchone()[0] or 0
+            conn.close()
+
+            # Se o ID for maior que o que a gente conhecia, tem pedido novo!
+            if max_id > ultimo_id_conhecido:
+                ultimo_id_conhecido = max_id
+                # Envia um "sinal de fumaça" para o JavaScript da cozinha
+                yield f"data: novo_pedido\n\n"
+            
+            # O servidor descansa 2 segundos antes de olhar o banco de novo
+            time.sleep(2)
+
+    return Response(event_stream(), mimetype="text/event-stream")
 
 # ROTA 9: Tela do Dashboard (Impressão)
 @app.route('/admin/dashboard')

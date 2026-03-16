@@ -34,7 +34,7 @@
                 "preco": 0.0
             }
         ],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 21,
@@ -61,7 +61,7 @@
                 "preco": 1.0
             }
         ],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 20,
@@ -88,7 +88,7 @@
                 "preco": 1.0
             }
         ],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 22,
@@ -115,7 +115,7 @@
                 "preco": 1.0
             }
         ],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 3,
@@ -189,7 +189,8 @@
         "desc": "Um hambúrguer suculento de 130g com presunto, muçarela, bacon crocante, alface fresca, tomate, picles, milho, ervilha, maionese, ketchup e batata palha.",
         "preco": 33.0,
         "img": "/static/uploads/202506242121_1M75_i.jpg",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": true
     },
     {
         "id": 4,
@@ -237,7 +238,20 @@
         "desc": "Hambúrguer 130g, presunto, muçarela, maionese e Ketchup.",
         "preco": 20.0,
         "img": "/static/uploads/X-Burguer.jpg",
-        "adicionais": [],
+        "adicionais": [
+            {
+                "nome": "HAMBURGUER",
+                "preco": 10.0
+            },
+            {
+                "nome": "bacon",
+                "preco": 7.0
+            },
+            {
+                "nome": "ovo",
+                "preco": 3.0
+            }
+        ],
         "ativo": true
     },
     {
@@ -257,7 +271,7 @@
         "preco": 26.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 16,
@@ -267,7 +281,7 @@
         "preco": 30.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 17,
@@ -277,7 +291,7 @@
         "preco": 32.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 18,
@@ -287,7 +301,7 @@
         "preco": 33.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 23,

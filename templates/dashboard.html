@@ -227,10 +227,10 @@
         let listaItens = pedido.itens ? pedido.itens.trim() : '';
 
         // Monta o texto do Zap
-        let texto = `Olá *${pedido.nome}*!\n\nSeu pedido *#${pedido.id}* já está em produção 👨‍🍳🔥\n\n`;
+        let texto = `Olá *${pedido.nome}*!\n\nSeu pedido *#${pedido.id}* já está em produção %F0%9F%91%A8%E2%80%8D%F1%9F%8D%B3 %F0%9F%94%A5\n\n`;
         texto += `*Itens do Pedido:*\n${listaItens}\n\n`;
         texto += `*Valor Total:* R$ ${pedido.total.toFixed(2)}\n\n`;
-        texto += `Fique de olho, logo avisaremos quando estiver pronto! 😉`;
+        texto += `Fique de olho, logo avisaremos quando estiver pronto! %F0%9F%98%8A`;
 
         // Gera o link e abre a conversa
         let linkWpp = `https://wa.me/${telefoneNum}?text=${encodeURIComponent(texto)}`;

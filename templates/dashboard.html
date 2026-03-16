@@ -213,27 +213,29 @@
         }
     }
 
-    // --- NOVA FUNÇÃO PARA ENVIAR ZAP PRO CLIENTE ---
     function avisarClienteWpp(pedido) {
-        // Limpa o número de telefone (tira traços, espaços, parênteses)
+        // Limpa e prepara o número
         let telefoneNum = pedido.cliente.replace(/\D/g, '');
-        
-        // Se o número tiver 10 ou 11 dígitos (padrão Brasil com DDD), adiciona o 55 na frente
         if (telefoneNum.length === 10 || telefoneNum.length === 11) {
             telefoneNum = '55' + telefoneNum;
         }
 
-        // Prepara a lista de itens (já vem com as quebras de linha corretas do banco)
         let listaItens = pedido.itens ? pedido.itens.trim() : '';
 
-        // Monta o texto do Zap
-        let texto = `Olá *${pedido.nome}*!\n\nSeu pedido *#${pedido.id}* já está em produção %F0%9F%91%A8%E2%80%8D%F1%9F%8D%B3 %F0%9F%94%A5\n\n`;
-        texto += `*Itens do Pedido:*\n${listaItens}\n\n`;
-        texto += `*Valor Total:* R$ ${pedido.total.toFixed(2)}\n\n`;
-        texto += `Fique de olho, logo avisaremos quando estiver pronto! %F0%9F%98%8A`;
+        // 1. Prepara as partes de TEXTO e usa o encodeURIComponent APENAS nelas
+        let saudacao = encodeURIComponent(`Olá *${pedido.nome}*!\n\nSeu pedido *#${pedido.id}* já está em produção `);
+        
+        let resumoPedido = encodeURIComponent(`\n\n*Itens do Pedido:*\n${listaItens}\n\n*Valor Total:* R$ ${pedido.total.toFixed(2)}\n\nFique de olho, logo avisaremos quando estiver pronto! `);
+
+        // 2. Prepara os códigos puros dos EMOJIS (já formatados para URL, incluindo os espaços como %20)
+        let emojiChefFogo = '%F0%9F%91%A8%E2%80%8D%F1%9F%8D%B3%20%F0%9F%94%A5';
+        let emojiSorriso = '%F0%9F%98%8A';
+
+        // 3. Junta tudo! Texto codificado + Emojis em código nativo da URL
+        let textoFinal = saudacao + emojiChefFogo + resumoPedido + emojiSorriso;
 
         // Gera o link e abre a conversa
-        let linkWpp = `https://wa.me/${telefoneNum}?text=${encodeURIComponent(texto)}`;
+        let linkWpp = `https://wa.me/${telefoneNum}?text=${textoFinal}`;
         window.open(linkWpp, '_blank');
     }
 

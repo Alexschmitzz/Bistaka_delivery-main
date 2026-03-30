@@ -165,7 +165,7 @@
                 let textoStatus = '👨‍🍳 Em Produção';
 
                 if (statusAtual === 'producao') {
-                    botaoStatusHtml = `<button onclick="mudarStatus(${p.id}, 'despachado')" style="background:#3498db; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 5px; width: 100%;">🛵 Despachar</button>`;
+                    botaoStatusHtml = `<button onclick="mudarStatus(${p.id}, 'despachado', '${p.cliente}')" style="background:#3498db; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 5px; width: 100%;">🛵 Despachar</button>`;
                 } else if (statusAtual === 'despachado') {
                     corBorda = '#3498db'; 
                     textoStatus = '🛵 Saiu para Entrega';
@@ -281,24 +281,46 @@
         window.print();
     }
 
-    async function mudarStatus(id, novoStatus) {
-        if(novoStatus === 'finalizado') {
-            const confirmar = confirm("Tem certeza que deseja finalizar? O pedido sairá da tela.");
-            if (!confirmar) return;
+    async function mudarStatus(id, novoStatus, telefoneCliente = null) {
+    if(novoStatus === 'finalizado') {
+        const confirmar = confirm("Tem certeza que deseja finalizar? O pedido sairá da tela.");
+        if (!confirmar) return;
+    }
+
+    // 🚨 A MÁGICA: Abrir o WhatsApp ANTES do 'await fetch'
+    // Como isso acontece no momento exato do clique, o navegador não bloqueia a aba!
+    if (novoStatus === 'despachado' && telefoneCliente) {
+        
+        // Limpa o número
+        let telefoneNum = telefoneCliente.replace(/\D/g, '');
+        if (telefoneNum.length === 10 || telefoneNum.length === 11) {
+            telefoneNum = '55' + telefoneNum;
         }
 
-        try {
-            await fetch(`/api/mudar_status/${id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: novoStatus })
-            });
-            buscarPedidos(); 
-        } catch (error) {
-            console.error("Erro ao mudar status:", error);
-            alert("Erro ao atualizar o pedido.");
-        }
+        // Mensagem e emoji blindados
+        let textoWpp = encodeURIComponent("Tô chegando! Seu pedido já está na rota de entrega ");
+        let emojiMoto = '%F0%9F%9B%B5'; // 🛵
+        
+        // Gera e abre o link do Zap IMEDIATAMENTE
+        let linkWpp = `https://api.whatsapp.com/send/?phone=${telefoneNum}&text=${textoWpp}${emojiMoto}&type=phone_number&app_absent=0`;
+        window.open(linkWpp, '_blank');
     }
+
+    // AGORA SIM, com a aba já aberta, enviamos a atualização para o Python
+    try {
+        await fetch(`/api/mudar_status/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: novoStatus })
+        });
+
+        // Atualiza a tela do dashboard
+        buscarPedidos(); 
+    } catch (error) {
+        console.error("Erro ao mudar status:", error);
+        alert("Erro ao atualizar o pedido.");
+    }
+}
   
     const fonteEventos = new EventSource('/api/stream_pedidos');
     

@@ -209,7 +209,7 @@
         "preco": 33.0,
         "img": "/static/uploads/X-Galinha.jpg",
         "adicionais": [],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 10,
@@ -219,7 +219,7 @@
         "preco": 31.0,
         "img": "/static/uploads/xcalabresa.jpg",
         "adicionais": [],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 11,
@@ -229,7 +229,7 @@
         "preco": 28.0,
         "img": "/static/uploads/X-Egg.jpg",
         "adicionais": [],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 12,
@@ -271,7 +271,7 @@
         "preco": 26.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 16,
@@ -281,7 +281,7 @@
         "preco": 30.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 17,
@@ -291,7 +291,7 @@
         "preco": 32.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 18,
@@ -301,7 +301,7 @@
         "preco": 33.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": true
+        "ativo": false
     },
     {
         "id": 23,
@@ -310,7 +310,8 @@
         "desc": "",
         "preco": 25.0,
         "img": "/static/uploads/Porcao_de_Batata_Frita.jpg",
-        "adicionais": []
+        "adicionais": [],
+        "ativo": true
     },
     {
         "id": 24,

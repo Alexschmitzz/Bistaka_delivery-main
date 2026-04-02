@@ -611,6 +611,9 @@ async function enviarWhatsapp() {
         if (tipoEntrega === 'delivery' && (!endereco || endereco.length < 3)) return alert("Informe seu endereço!");
         if (!pag) return alert("Selecione a forma de pagamento.");
 
+        // Se o GPS foi usado, o endereço salvo serão as coordenadas. Senão, o texto digitado.
+        const enderecoParaSalvar = (clienteLat && clienteLng) ? `${clienteLat},${clienteLng}` : endereco;
+
         // --- PREPARAÇÃO DO TEXTO DO ZAP ---
         let textoZap = `*PEDIDO BISTAKA*\n----------------\n`;
         textoZap += `👤 *Cliente:* ${nomeCliente}\n`;
@@ -676,7 +679,7 @@ async function enviarWhatsapp() {
                 body: JSON.stringify({
                     telefone: telefone,
                     nome: nomeCliente,
-                    endereco: endereco,
+                    endereco: enderecoParaSalvar,
                     bairro: bairroDb,
                     total: totalFinal,
                     pagamento: pag,

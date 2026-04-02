@@ -69,6 +69,15 @@
         }
         .btn-wpp-cliente:hover { background: #20bd5a; }
 
+        /* Estilo para o novo botão do Mapa */
+        .btn-mapa {
+            background: #4285F4; color: white; border: none; padding: 10px 20px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-top: 5px; text-decoration: none;
+        }
+        .btn-mapa:hover { background: #357ABD; }
+
         /* --- ADAPTAÇÃO PARA CELULAR (Mobile) --- */
         @media (max-width: 768px) {
             body { padding: 5px; background: #f5f6fa; }
@@ -172,10 +181,13 @@
                     botaoStatusHtml = `<button onclick="mudarStatus(${p.id}, 'finalizado')" style="background:#2ecc71; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom: 5px; width: 100%;">✅ Finalizar</button>`;
                 }
 
-                const itensFormatadosTela = p.itens.replace(/\n/g, '<br>');
                 const infoEndereco = (p.bairro === 'Retirada' || !p.endereco) 
                     ? `<p style="color:#e67e22; font-weight:bold;">🏃 Retirada no Balcão</p>` 
                     : `<p><strong>📍 Entrega:</strong> ${p.endereco} (${p.bairro})</p>`;
+
+                const mapaBotaoHtml = (p.bairro === 'Retirada' || !p.endereco)
+                    ? ''
+                    : `<a href="https://www.google.com/maps?q=${encodeURIComponent(p.endereco + ', ' + p.bairro)}" target="_blank" class="btn-mapa" style="width: 100%;">🗺️ Ver no Mapa</a>`;
                     
                 lista.innerHTML += `
                     <div class="card-pedido ${p.id === ultimoId ? 'novo' : ''}" style="border-left: 6px solid ${corBorda};">
@@ -203,6 +215,7 @@
                             <button class="btn-wpp-cliente" onclick='avisarClienteWpp(${JSON.stringify(p)})' style="width: 100%;">
                                 📱 Avisar Cliente
                             </button>
+                            ${mapaBotaoHtml}
                         </div>
                     </div>
                 `;
@@ -214,31 +227,30 @@
     }
 
     function avisarClienteWpp(pedido) {
-        // Limpa e prepara o número
-        let telefoneNum = pedido.cliente.replace(/\D/g, '');
-        if (telefoneNum.length === 10 || telefoneNum.length === 11) {
-            telefoneNum = '55' + telefoneNum;
-        }
-
-        let listaItens = pedido.itens ? pedido.itens.trim() : '';
-
-        // 1. Prepara as partes de TEXTO e usa o encodeURIComponent APENAS nelas
-        let saudacao = encodeURIComponent(`Olá *${pedido.nome}*!\n\nSeu pedido *#${pedido.id}* já está em produção `);
-        
-        let resumoPedido = encodeURIComponent(`\n\n*Itens do Pedido:*\n${listaItens}\n\n*Valor Total:* R$ ${pedido.total.toFixed(2)}\n\nFique de olho, logo avisaremos quando estiver pronto! `);
-
-        // 2. Prepara os códigos puros dos EMOJIS (já formatados para URL, incluindo os espaços como %20)
-        let emojiChefFogo = '%F0%9F%91%A8%E2%80%8D%F1%9F%8D%B3%20%F0%9F%94%A5';
-        let emojiSorriso = '%F0%9F%98%8A';
-
-        // 3. Junta tudo! Texto codificado + Emojis em código nativo da URL
-        let textoFinal = saudacao + emojiChefFogo + resumoPedido + emojiSorriso;
-
-        // Gera o link e abre a conversa
-        let linkWpp = `https://wa.me/${telefoneNum}?text=${textoFinal}`;
-        window.open(linkWpp, '_blank');
+    // 1. Limpa e prepara o número
+    let telefoneNum = pedido.cliente.replace(/\D/g, '');
+    if (telefoneNum.length === 10 || telefoneNum.length === 11) {
+        telefoneNum = '55' + telefoneNum;
     }
 
+    let listaItens = pedido.itens ? pedido.itens.trim() : '';
+
+    // 2. Separa os textos normais e codifica eles (SEM EMOJIS AQUI)
+    let parte1 = encodeURIComponent(`Olá *${pedido.nome}*!\n\nSeu pedido *#${pedido.id}* já está em produção `);
+    let parte2 = encodeURIComponent(`\n\n*Itens do Pedido:*\n${listaItens}\n\n*Valor Total:* R$ ${pedido.total.toFixed(2)}\n\nFique de olho, logo avisaremos quando estiver pronto! `);
+
+    // 3. Emojis JÁ convertidos para URL (já com os espaços %20 incluídos)
+    let emojisChefFogo = '%F0%9F%91%A8%E2%80%8D%F0%9F%8D%B3%20%F0%9F%94%A5';
+    let emojiSorriso = '%F0%9F%98%8A';
+
+    // 4. Junta tudo direto na variável de URL
+    let textoFinalUrl = parte1 + emojisChefFogo + parte2 + emojiSorriso;
+
+    // 5. Gera o link usando a URL oficial da API (igual ao seu print)
+    let linkWpp = `https://api.whatsapp.com/send/?phone=${telefoneNum}&text=${textoFinalUrl}&type=phone_number&app_absent=0`;
+    
+    window.open(linkWpp, '_blank');
+}
     function imprimirComanda(p) {
         const cupom = document.getElementById('cupom-fiscal');
         

@@ -229,7 +229,7 @@
         "preco": 28.0,
         "img": "/static/uploads/X-Egg.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 12,
@@ -271,7 +271,7 @@
         "preco": 26.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 16,
@@ -301,7 +301,7 @@
         "preco": 33.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 23,

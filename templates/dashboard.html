@@ -83,7 +83,7 @@
             body { padding: 5px; background: #f5f6fa; }
             .painel-container { padding: 15px; height: 98vh; border-radius: 10px; box-shadow: none; }
             h1 { flex-direction: column; gap: 15px; font-size: 1.5rem; text-align: center; }
-            h1 div { display: flex; width: 100%; justify-content: space-between; gap: 10px; }
+            h1 div { display: flex; width: 100%; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
             h1 div a, h1 div button { flex: 1; text-align: center; margin: 0; }
             .card-pedido { flex-direction: column; align-items: stretch; gap: 15px; }
             .info-pedido { padding-right: 0 !important; }
@@ -135,6 +135,7 @@
     <h1>
         <span>🖥️ Pedidos - Cozinha</span>
         <div>
+            <button id="btn-notificacao" onclick="ativarNotificacoes()" style="background:#f39c12; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:1rem; margin-right:5px;">🔔 Ativar Notificações</button>
             <a href="/admin/relatorio" style="background:#8e44ad; color:white; padding:10px; text-decoration:none; border-radius:5px; font-size:1rem;">📊 Fechar Caixa</a>
             <button class="btn-refresh" onclick="buscarPedidos()">🔄 Atualizar</button>
         </div>
@@ -151,6 +152,44 @@
     let ultimoId = 0;
     const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
 
+    function ativarNotificacoes() {
+        if (!("Notification" in window)) {
+            alert("Este navegador não suporta notificações de sistema.");
+            return;
+        }
+        Notification.requestPermission().then(function (permission) {
+            if (permission === "granted") {
+                alert("Notificações ativadas com sucesso!");
+                const btn = document.getElementById('btn-notificacao');
+                if (btn) btn.style.display = 'none';
+            } else {
+                alert("Permissão para notificações negada.");
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if ("Notification" in window && Notification.permission === "granted") {
+            const btn = document.getElementById('btn-notificacao');
+            if (btn) btn.style.display = 'none';
+        }
+    });
+
+    function dispararNotificacao(pedido) {
+        if ("Notification" in window && Notification.permission === "granted") {
+            const opcoes = {
+                body: `Cliente: ${pedido.nome}\nValor: R$ ${pedido.total.toFixed(2)}\nClique para ver o pedido.`,
+                icon: '/static/uploads/logo.png',
+                vibrate: [200, 100, 200, 100, 200]
+            };
+            const n = new Notification(`🔔 Novo Pedido #${pedido.id}!`, opcoes);
+            n.onclick = function() {
+                window.focus();
+                this.close();
+            };
+        }
+    }
+
     async function buscarPedidos() {
         try {
             const response = await fetch('/api/pedidos_hoje');
@@ -160,7 +199,10 @@
             lista.innerHTML = ''; 
 
             if (pedidos.length > 0 && pedidos[0].id > ultimoId) {
-                if (ultimoId !== 0) audio.play();
+                if (ultimoId !== 0) {
+                    audio.play().catch(e => console.log("Erro ao reproduzir áudio:", e));
+                    dispararNotificacao(pedidos[0]);
+                }
                 ultimoId = pedidos[0].id;
             }
 

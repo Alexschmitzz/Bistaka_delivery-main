@@ -209,7 +209,7 @@
         "preco": 33.0,
         "img": "/static/uploads/X-Galinha.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 10,
@@ -259,7 +259,7 @@
         "categoria": "Hotdogs",
         "nome": " Hotdog Tradicional",
         "desc": "Experimente o clássico Hotdog Tradicional, com 2 salsichas suculentas, repolho crocante, cebola, milho, ervilha, batata palha, queijo ralado, maionese e ketchup molho da panela.",
-        "preco": 23.0,
+        "preco": 24.0,
         "img": "/static/uploads/hotdogtrad.jpg",
         "adicionais": []
     },
@@ -291,7 +291,7 @@
         "preco": 32.0,
         "img": "/static/uploads/dogprensado.jpg",
         "adicionais": [],
-        "ativo": false
+        "ativo": true
     },
     {
         "id": 18,
@@ -360,7 +360,7 @@
         "categoria": "Bebidas",
         "nome": "Refrigerante 2l",
         "desc": "Escolha seu refri",
-        "preco": 16.0,
+        "preco": 18.0,
         "img": "/static/uploads/202508031816_7162_i.jpg",
         "adicionais": [
             {
